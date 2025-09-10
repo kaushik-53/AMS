@@ -4,6 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { useSearchParams } from "next/navigation";
+import { useActionState } from "react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -23,7 +24,6 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { loginAction } from "@/lib/actions";
-import { useFormState } from "react-dom";
 import AppLogo from "@/components/app-logo";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Terminal } from "lucide-react";
@@ -55,7 +55,7 @@ export default function LoginPage() {
     },
   });
 
-  const [state, formAction] = useFormState(loginAction, {
+  const [state, formAction] = useActionState(loginAction, {
     message: "",
   });
 
