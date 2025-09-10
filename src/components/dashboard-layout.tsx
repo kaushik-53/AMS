@@ -62,10 +62,11 @@ export function DashboardLayout({ children, navItems }: DashboardLayoutProps) {
           <SidebarMenu>
             {navItems.map((item) => (
               <SidebarMenuItem key={item.href}>
-                <Link href={`${item.href}?userId=${userId}`} legacyBehavior passHref>
+                <Link href={`${item.href}?userId=${userId}`}>
                   <SidebarMenuButton
                     isActive={isNavItemActive(item)}
                     tooltip={item.label}
+                    asChild={false}
                   >
                     <item.icon />
                     <span>{item.label}</span>
