@@ -1,16 +1,8 @@
 import type { ReactNode, FC } from "react";
-import {
-  DashboardLayout,
-  type NavItem,
-} from "@/components/dashboard-layout";
-import { BarChart3 } from "lucide-react";
-
-const studentNavItems: NavItem[] = [
-  { href: "/student", label: "My Attendance", icon: BarChart3, exact: true },
-];
+import { StudentDashboardLayout } from "./_components/student-dashboard-layout";
 
 const StudentLayout: FC<{ children: ReactNode }> = ({ children }) => {
-  return <DashboardLayout navItems={studentNavItems}>{children}</DashboardLayout>;
+  return <StudentDashboardLayout>{children}</StudentDashboardLayout>;
 };
 
 export default StudentLayout;
