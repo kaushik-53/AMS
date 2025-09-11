@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import type { User, Class } from "@/lib/types";
 import { Button } from "@/components/ui/button";
 import {
@@ -62,6 +62,7 @@ import { exportToCsv } from "@/lib/utils";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { PlaceHolderImages } from "@/lib/placeholder-images";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 
 const studentFormSchema = z.object({
   id: z.string().optional(),
@@ -85,6 +86,17 @@ export function StudentsTable({
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingStudent, setEditingStudent] = useState<User | null>(null);
   const { toast } = useToast();
+
+  const studentsByClass = useMemo(() => {
+    return initialStudents.reduce((acc, student) => {
+      const classId = student.classId || 'unassigned';
+      if (!acc[classId]) {
+        acc[classId] = [];
+      }
+      acc[classId].push(student);
+      return acc;
+    }, {} as Record<string, User[]>);
+  }, [initialStudents]);
 
   const form = useForm<StudentFormValues>({
     resolver: zodResolver(studentFormSchema),
@@ -127,14 +139,10 @@ export function StudentsTable({
   const onSubmit = async (values: StudentFormValues) => {
     const result = await saveStudent(values);
     if (result.success) {
-        // This is a simplification. In a real app, you'd get the updated list from the server.
         if (editingStudent) {
             setStudents(students.map(s => s.id === editingStudent.id ? {...s, ...values, id: s.id} : s));
-        } else {
-           // For new student, we can't know the ID without a server roundtrip.
-           // We will just show a success message. The table will update on next page load.
         }
-      toast({ title: "Success", description: result.message });
+        toast({ title: "Success", description: result.message });
     } else {
       toast({
         variant: "destructive",
@@ -170,86 +178,108 @@ export function StudentsTable({
     return names.length > 1 ? `${names[0][0]}${names[names.length - 1][0]}` : name.substring(0, 2);
   }
 
+  const renderStudentTable = (studentList: User[]) => (
+     <Table>
+      <TableHeader>
+        <TableRow>
+          <TableHead>Name</TableHead>
+          <TableHead>Grade</TableHead>
+          <TableHead>Parent's Email</TableHead>
+          <TableHead>
+            <span className="sr-only">Actions</span>
+          </TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        {studentList.map((student) => (
+          <TableRow key={student.id}>
+            <TableCell className="font-medium">
+              <div className="flex items-center gap-3">
+                <Avatar className="h-8 w-8">
+                   <AvatarImage src={getAvatarUrl(student)} alt={student.name} data-ai-hint="student avatar" />
+                   <AvatarFallback>{getInitials(student.name)}</AvatarFallback>
+                </Avatar>
+                <div className="flex flex-col">
+                    <span>{student.name}</span>
+                    <span className="text-xs text-muted-foreground">{student.email}</span>
+                </div>
+              </div>
+            </TableCell>
+            <TableCell>{student.grade}</TableCell>
+            <TableCell>{student.parentEmail}</TableCell>
+            <TableCell>
+              <AlertDialog>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button aria-haspopup="true" size="icon" variant="ghost">
+                      <MoreHorizontal className="h-4 w-4" />
+                      <span className="sr-only">Toggle menu</span>
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuItem onSelect={() => handleEdit(student)}>Edit</DropdownMenuItem>
+                     <AlertDialogTrigger asChild>
+                      <DropdownMenuItem onSelect={(e) => e.preventDefault()}>Delete</DropdownMenuItem>
+                    </AlertDialogTrigger>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      This action cannot be undone. This will permanently delete the student account.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogAction onClick={() => handleDelete(student.id)}>Continue</AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+            </TableCell>
+          </TableRow>
+        ))}
+      </TableBody>
+    </Table>
+  );
+
   return (
-    <Card>
-      <CardHeader>
-        <div className="flex justify-between items-center">
-          <div>
-            <CardTitle>Students</CardTitle>
-            <CardDescription>Manage student records.</CardDescription>
+    <>
+      <Card>
+        <CardHeader>
+          <div className="flex justify-between items-center">
+            <div>
+              <CardTitle>Students</CardTitle>
+              <CardDescription>Manage student records, grouped by class.</CardDescription>
+            </div>
+            <div className="flex gap-2">
+              <Button variant="outline" size="sm" onClick={handleExport}><FileDown className="mr-2 h-4 w-4" /> Export All</Button>
+              <Button size="sm" onClick={handleAddNew}><PlusCircle className="mr-2 h-4 w-4" /> Add New Student</Button>
+            </div>
           </div>
-          <div className="flex gap-2">
-            <Button variant="outline" size="sm" onClick={handleExport}><FileDown className="mr-2 h-4 w-4" /> Export CSV</Button>
-            <Button size="sm" onClick={handleAddNew}><PlusCircle className="mr-2 h-4 w-4" /> Add New</Button>
-          </div>
-        </div>
-      </CardHeader>
-      <CardContent>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Name</TableHead>
-              <TableHead>Grade</TableHead>
-              <TableHead>Class</TableHead>
-              <TableHead>Parent's Email</TableHead>
-              <TableHead>
-                <span className="sr-only">Actions</span>
-              </TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {students.map((student) => (
-              <TableRow key={student.id}>
-                <TableCell className="font-medium">
-                  <div className="flex items-center gap-3">
-                    <Avatar className="h-8 w-8">
-                       <AvatarImage src={getAvatarUrl(student)} alt={student.name} data-ai-hint="student avatar" />
-                       <AvatarFallback>{getInitials(student.name)}</AvatarFallback>
-                    </Avatar>
-                    <div className="flex flex-col">
-                        <span>{student.name}</span>
-                        <span className="text-xs text-muted-foreground">{student.email}</span>
-                    </div>
-                  </div>
-                </TableCell>
-                <TableCell>{student.grade}</TableCell>
-                <TableCell>{classes.find(c => c.id === student.classId)?.name || 'N/A'}</TableCell>
-                <TableCell>{student.parentEmail}</TableCell>
-                <TableCell>
-                  <AlertDialog>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button aria-haspopup="true" size="icon" variant="ghost">
-                          <MoreHorizontal className="h-4 w-4" />
-                          <span className="sr-only">Toggle menu</span>
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuItem onSelect={() => handleEdit(student)}>Edit</DropdownMenuItem>
-                        <AlertDialogTrigger asChild>
-                          <DropdownMenuItem onSelect={(e) => e.preventDefault()}>Delete</DropdownMenuItem>
-                        </AlertDialogTrigger>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                    <AlertDialogContent>
-                      <AlertDialogHeader>
-                        <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-                        <AlertDialogDescription>
-                          This action cannot be undone. This will permanently delete the student account.
-                        </AlertDialogDescription>
-                      </AlertDialogHeader>
-                      <AlertDialogFooter>
-                        <AlertDialogCancel>Cancel</AlertDialogCancel>
-                        <AlertDialogAction onClick={() => handleDelete(student.id)}>Continue</AlertDialogAction>
-                      </AlertDialogFooter>
-                    </AlertDialogContent>
-                  </AlertDialog>
-                </TableCell>
-              </TableRow>
+        </CardHeader>
+        <CardContent>
+          <Accordion type="multiple" defaultValue={classes.map(c => c.id)} className="w-full">
+            {classes.map((c) => (
+              <AccordionItem value={c.id} key={c.id}>
+                <AccordionTrigger className="text-lg font-medium">{c.name}</AccordionTrigger>
+                <AccordionContent>
+                  {studentsByClass[c.id] ? renderStudentTable(studentsByClass[c.id]) : <p className="p-4 text-muted-foreground">No students in this class.</p>}
+                </AccordionContent>
+              </AccordionItem>
             ))}
-          </TableBody>
-        </Table>
-      </CardContent>
+            {studentsByClass['unassigned'] && (
+               <AccordionItem value="unassigned">
+                <AccordionTrigger className="text-lg font-medium">Unassigned Students</AccordionTrigger>
+                <AccordionContent>
+                  {renderStudentTable(studentsByClass['unassigned'])}
+                </AccordionContent>
+              </AccordionItem>
+            )}
+          </Accordion>
+        </CardContent>
+      </Card>
+      
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent>
           <DialogHeader>
@@ -312,6 +342,6 @@ export function StudentsTable({
           </Form>
         </DialogContent>
       </Dialog>
-    </Card>
+    </>
   );
 }
