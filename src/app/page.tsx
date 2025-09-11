@@ -4,7 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { useSearchParams } from "next/navigation";
-import { useActionState } from "react";
+import { useActionState, useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -46,6 +46,7 @@ const formSchema = z.object({
 });
 
 export default function LoginPage() {
+  const [errorMessage, setErrorMessage] = useState("");
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -57,6 +58,16 @@ export default function LoginPage() {
   const [state, formAction] = useActionState(loginAction, {
     message: "",
   });
+
+  useEffect(() => {
+    if (state?.message) {
+      setErrorMessage(state.message);
+      const timer = setTimeout(() => {
+        setErrorMessage("");
+      }, 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [state?.message]);
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-center p-4">
@@ -106,11 +117,11 @@ export default function LoginPage() {
                   </FormItem>
                 )}
               />
-              {state?.message && (
+              {errorMessage && (
                 <Alert variant="destructive">
                   <Terminal className="h-4 w-4" />
                   <AlertTitle>Authentication Failed</AlertTitle>
-                  <AlertDescription>{state.message}</AlertDescription>
+                  <AlertDescription>{errorMessage}</AlertDescription>
                 </Alert>
               )}
               <Button type="submit" className="w-full">
