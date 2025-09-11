@@ -6,10 +6,10 @@ export const mockUsers: User[] = [
   { id: '1', name: 'Rohan Sharma', email: 'admin', role: 'admin', avatarId: '1', password: 'Admin@123' },
   
   // Teachers
-  { id: '2', name: 'Priya Mehta', email: 'english', role: 'teacher', classId: 'C11', subject: 'English', avatarId: '2', password: 'English@123' },
-  { id: '3', name: 'Vikram Singh', email: 'physics', role: 'teacher', classId: 'C11', subject: 'Physics', avatarId: '3', password: 'Physics@123' },
-  { id: '4', name: 'Anjali Gupta', email: 'chemistry', role: 'teacher', classId: 'C12', subject: 'Chemistry', avatarId: '4', password: 'Chemistry@123' },
-  { id: '5', name: 'Sanjay Kumar', email: 'maths', role: 'teacher', classId: 'C12', subject: 'Maths', avatarId: '5', password: 'Maths@123' },
+  { id: '2', name: 'Priya Mehta', email: 'english', role: 'teacher', subject: 'English', avatarId: '2', password: 'English@123' },
+  { id: '3', name: 'Vikram Singh', email: 'physics', role: 'teacher', subject: 'Physics', avatarId: '3', password: 'Physics@123' },
+  { id: '4', name: 'Anjali Gupta', email: 'chemistry', role: 'teacher', subject: 'Chemistry', avatarId: '4', password: 'Chemistry@123' },
+  { id: '5', name: 'Sanjay Kumar', email: 'maths', role: 'teacher', subject: 'Maths', avatarId: '5', password: 'Maths@123' },
 
   // Students - Class 11
   { id: 's1101', name: 'Aarav Patel', email: 'class11_roll1', role: 'student', grade: 11, parentEmail: 'parent1101@example.com', avatarId: '6', password: 'Student@111', classId: 'C11' },

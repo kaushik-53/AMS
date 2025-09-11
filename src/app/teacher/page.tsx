@@ -1,6 +1,7 @@
-import { getUserById, getStudentsByClass, getClasses } from "@/lib/actions";
+import { getUserById, getStudentsByClass, getClasses, getTimetable } from "@/lib/actions";
 import AttendanceForm from "./_components/attendance-form";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { TeacherAttendance } from "./_components/teacher-attendance";
 
 export default async function TeacherDashboardPage({
   searchParams,
@@ -10,7 +11,7 @@ export default async function TeacherDashboardPage({
   const userId = searchParams.userId as string;
   const teacher = await getUserById(userId);
 
-  if (!teacher || teacher.role !== 'teacher' || !teacher.classId) {
+  if (!teacher || teacher.role !== 'teacher') {
     return (
       <Card>
         <CardHeader>
@@ -23,28 +24,19 @@ export default async function TeacherDashboardPage({
     )
   }
   
-  const assignedClass = (await getClasses()).find(c => c.id === teacher.classId);
-  if (!assignedClass) {
-     return <p>Could not find assigned class.</p>
-  }
-  
-  const students = await getStudentsByClass(teacher.classId);
+  const timetable = await getTimetable();
+  const allClasses = await getClasses();
+
+  const teacherClassIds = [...new Set(timetable.filter(t => t.teacherId === teacher.id).map(t => t.classId))];
+  const teacherClasses = allClasses.filter(c => teacherClassIds.includes(c.id));
+
 
   return (
     <div>
-        <Card>
-            <CardHeader>
-                <CardTitle>Mark Attendance for {assignedClass.name}</CardTitle>
-                <CardDescription>Select a date and mark each student as present or absent.</CardDescription>
-            </CardHeader>
-            <CardContent>
-                <AttendanceForm 
-                    students={students} 
-                    classId={teacher.classId}
-                    teacherName={teacher.name}
-                />
-            </CardContent>
-        </Card>
+        <TeacherAttendance 
+            teacher={teacher}
+            teacherClasses={teacherClasses}
+        />
     </div>
   );
 }
