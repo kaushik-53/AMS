@@ -5,7 +5,7 @@ import {
   DashboardLayout,
   type NavItem,
 } from "@/components/dashboard-layout";
-import { ClipboardList } from "lucide-react";
+import { ClipboardList, BookCheck } from "lucide-react";
 
 const teacherNavItems: NavItem[] = [
   {
@@ -13,6 +13,11 @@ const teacherNavItems: NavItem[] = [
     label: "Mark Attendance",
     icon: ClipboardList,
     exact: true,
+  },
+  {
+    href: "/teacher/report",
+    label: "Attendance Report",
+    icon: BookCheck,
   },
 ];
 

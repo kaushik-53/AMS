@@ -5,12 +5,13 @@ import {
   DashboardLayout,
   type NavItem,
 } from "@/components/dashboard-layout";
-import { LayoutDashboard, Users, UserCheck } from "lucide-react";
+import { LayoutDashboard, Users, UserCheck, BookCheck } from "lucide-react";
 
 const adminNavItems: NavItem[] = [
   { href: "/admin", label: "Dashboard", icon: LayoutDashboard, exact: true },
   { href: "/admin/students", label: "Students", icon: Users },
   { href: "/admin/teachers", label: "Teachers", icon: UserCheck },
+  { href: "/admin/attendance", label: "Attendance", icon: BookCheck },
 ];
 
 export const AdminDashboardLayout: FC<{ children: ReactNode }> = ({

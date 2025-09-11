@@ -79,6 +79,10 @@ export async function getAllAttendance(): Promise<AttendanceRecord[]> {
     return mockAttendance;
 }
 
+export async function getAttendanceByClass(classId: string): Promise<AttendanceRecord[]> {
+    return mockAttendance.filter(a => a.classId === classId);
+}
+
 
 // --- Data Mutations ---
 
@@ -125,6 +129,8 @@ export async function saveAttendance(
       }
     }
     revalidatePath("/teacher");
+    revalidatePath("/teacher/report");
+    revalidatePath("/admin/attendance");
     return { success: true, message: "Attendance saved successfully." };
   } catch (error) {
     return { success: false, message: "Failed to save attendance." };
