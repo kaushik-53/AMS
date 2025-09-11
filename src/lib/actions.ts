@@ -14,7 +14,7 @@ export async function loginAction(
   formData: FormData
 ) {
   const schema = z.object({
-    email: z.string().email(),
+    email: z.string(),
     password: z.string(),
   });
   const parsed = schema.safeParse(Object.fromEntries(formData.entries()));
@@ -63,14 +63,7 @@ export async function getClasses(): Promise<Class[]> {
 }
 
 export async function getStudentsByClass(classId: string): Promise<User[]> {
-    const allUsers = await getStudents();
-    // In a real app, students would be associated with classes. Here we just return students from a teacher's class.
-    const teacher = mockUsers.find(u => u.classId === classId);
-    if(teacher) {
-        // Just returning some students for the demo
-        return allUsers.filter(u => ['3', '4', '5', '6'].includes(u.id));
-    }
-    return [];
+    return mockUsers.filter(u => u.role === 'student' && u.classId === classId);
 }
 
 
@@ -158,7 +151,7 @@ async function upsertUser(user: Omit<User, 'password' | 'avatarId'> & { password
   return { success: true, message: `User ${user.id ? 'updated' : 'created'} successfully.` };
 }
 
-export async function saveStudent(studentData: { id?: string; name: string; email: string; grade: number; parentEmail: string }) {
+export async function saveStudent(studentData: { id?: string; name: string; email: string; grade: number; parentEmail: string, classId?: string }) {
     return upsertUser({ ...studentData, role: 'student' });
 }
 

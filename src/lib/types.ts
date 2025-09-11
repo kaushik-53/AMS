@@ -8,6 +8,7 @@ export interface User {
   avatarId: string;
   // For teachers
   classId?: string;
+  subject?: string;
   // For students
   grade?: number;
   parentEmail?: string;

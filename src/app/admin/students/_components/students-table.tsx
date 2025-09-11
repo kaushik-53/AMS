@@ -61,6 +61,7 @@ import { useToast } from "@/hooks/use-toast";
 import { exportToCsv } from "@/lib/utils";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { PlaceHolderImages } from "@/lib/placeholder-images";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 const studentFormSchema = z.object({
   id: z.string().optional(),
@@ -68,6 +69,7 @@ const studentFormSchema = z.object({
   email: z.string().email("Invalid email address"),
   grade: z.coerce.number().min(1, "Grade is required"),
   parentEmail: z.string().email("Invalid parent email"),
+  classId: z.string().optional(),
 });
 
 type StudentFormValues = z.infer<typeof studentFormSchema>;
@@ -96,14 +98,15 @@ export function StudentsTable({
         name: student.name,
         email: student.email,
         grade: student.grade,
-        parentEmail: student.parentEmail
+        parentEmail: student.parentEmail,
+        classId: student.classId
     });
     setIsDialogOpen(true);
   };
   
   const handleAddNew = () => {
     setEditingStudent(null);
-    form.reset({ id: undefined, name: "", email: "", grade: undefined, parentEmail: "" });
+    form.reset({ id: undefined, name: "", email: "", grade: undefined, parentEmail: "", classId: "" });
     setIsDialogOpen(true);
   }
 
@@ -126,7 +129,7 @@ export function StudentsTable({
     if (result.success) {
         // This is a simplification. In a real app, you'd get the updated list from the server.
         if (editingStudent) {
-            setStudents(students.map(s => s.id === editingStudent.id ? {...s, ...values} : s));
+            setStudents(students.map(s => s.id === editingStudent.id ? {...s, ...values, id: s.id} : s));
         } else {
            // For new student, we can't know the ID without a server roundtrip.
            // We will just show a success message. The table will update on next page load.
@@ -149,9 +152,10 @@ export function StudentsTable({
       s.email,
       s.grade || 'N/A',
       s.parentEmail || 'N/A',
+      classes.find(c => c.id === s.classId)?.name || 'N/A',
     ]);
     exportToCsv("students.csv", [
-        ["ID", "Name", "Email", "Grade", "Parent Email"],
+        ["ID", "Name", "Email", "Grade", "Parent Email", "Class"],
         ...dataToExport
     ]);
   }
@@ -186,6 +190,7 @@ export function StudentsTable({
             <TableRow>
               <TableHead>Name</TableHead>
               <TableHead>Grade</TableHead>
+              <TableHead>Class</TableHead>
               <TableHead>Parent's Email</TableHead>
               <TableHead>
                 <span className="sr-only">Actions</span>
@@ -208,6 +213,7 @@ export function StudentsTable({
                   </div>
                 </TableCell>
                 <TableCell>{student.grade}</TableCell>
+                <TableCell>{classes.find(c => c.id === student.classId)?.name || 'N/A'}</TableCell>
                 <TableCell>{student.parentEmail}</TableCell>
                 <TableCell>
                   <AlertDialog>
@@ -261,8 +267,8 @@ export function StudentsTable({
               />
               <FormField control={form.control} name="email" render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Email</FormLabel>
-                    <FormControl><Input type="email" {...field} /></FormControl>
+                    <FormLabel>Email (Login ID)</FormLabel>
+                    <FormControl><Input {...field} /></FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -279,6 +285,19 @@ export function StudentsTable({
                   <FormItem>
                     <FormLabel>Parent's Email</FormLabel>
                     <FormControl><Input type="email" {...field} /></FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField control={form.control} name="classId" render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Assign Class</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl><SelectTrigger><SelectValue placeholder="Select a class" /></SelectTrigger></FormControl>
+                        <SelectContent>
+                            {classes.map(c => <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>)}
+                        </SelectContent>
+                    </Select>
                     <FormMessage />
                   </FormItem>
                 )}

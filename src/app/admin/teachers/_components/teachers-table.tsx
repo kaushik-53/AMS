@@ -73,8 +73,9 @@ import { PlaceHolderImages } from "@/lib/placeholder-images";
 const teacherFormSchema = z.object({
   id: z.string().optional(),
   name: z.string().min(1, "Name is required"),
-  email: z.string().email("Invalid email address"),
+  email: z.string().min(1, "Login ID is required"),
   classId: z.string().min(1, "Class assignment is required"),
+  subject: z.string().optional(),
 });
 
 type TeacherFormValues = z.infer<typeof teacherFormSchema>;
@@ -93,7 +94,7 @@ export function TeachersTable({
 
   const form = useForm<TeacherFormValues>({
     resolver: zodResolver(teacherFormSchema),
-    defaultValues: { name: "", email: "", classId: "" },
+    defaultValues: { name: "", email: "", classId: "", subject: "" },
   });
 
   const handleEdit = (teacher: User) => {
@@ -102,14 +103,15 @@ export function TeachersTable({
         id: teacher.id,
         name: teacher.name,
         email: teacher.email,
-        classId: teacher.classId
+        classId: teacher.classId,
+        subject: teacher.subject,
     });
     setIsDialogOpen(true);
   };
   
   const handleAddNew = () => {
     setEditingTeacher(null);
-    form.reset({ id: undefined, name: "", email: "", classId: "" });
+    form.reset({ id: undefined, name: "", email: "", classId: "", subject: "" });
     setIsDialogOpen(true);
   }
 
@@ -132,7 +134,7 @@ export function TeachersTable({
     if (result.success) {
       // Simplification for optimistic update
       if (editingTeacher) {
-          setTeachers(teachers.map(t => t.id === editingTeacher.id ? {...t, ...values} : t));
+          setTeachers(teachers.map(t => t.id === editingTeacher.id ? {...t, ...values, id: t.id} : t));
       }
       toast({ title: "Success", description: result.message });
     } else {
@@ -150,10 +152,11 @@ export function TeachersTable({
       t.id,
       t.name,
       t.email,
+      t.subject || 'N/A',
       classes.find(c => c.id === t.classId)?.name || 'N/A',
     ]);
     exportToCsv("teachers.csv", [
-        ["ID", "Name", "Email", "Class"],
+        ["ID", "Name", "Email", "Subject", "Class"],
         ...dataToExport
     ]);
   }
@@ -187,6 +190,7 @@ export function TeachersTable({
           <TableHeader>
             <TableRow>
               <TableHead>Name</TableHead>
+              <TableHead>Subject</TableHead>
               <TableHead>Assigned Class</TableHead>
               <TableHead>
                 <span className="sr-only">Actions</span>
@@ -208,6 +212,7 @@ export function TeachersTable({
                     </div>
                   </div>
                 </TableCell>
+                <TableCell>{teacher.subject || 'N/A'}</TableCell>
                 <TableCell>{classes.find(c => c.id === teacher.classId)?.name || 'Unassigned'}</TableCell>
                 <TableCell>
                   <AlertDialog>
@@ -256,7 +261,11 @@ export function TeachersTable({
                 )}
               />
               <FormField control={form.control} name="email" render={({ field }) => (
-                  <FormItem><FormLabel>Email</FormLabel><FormControl><Input type="email" {...field} /></FormControl><FormMessage /></FormItem>
+                  <FormItem><FormLabel>Login ID</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>
+                )}
+              />
+               <FormField control={form.control} name="subject" render={({ field }) => (
+                  <FormItem><FormLabel>Subject</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>
                 )}
               />
               <FormField control={form.control} name="classId" render={({ field }) => (
