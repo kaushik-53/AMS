@@ -14,19 +14,19 @@ export async function loginAction(
   formData: FormData
 ) {
   const schema = z.object({
-    email: z.string(),
+    username: z.string(),
     password: z.string(),
   });
   const parsed = schema.safeParse(Object.fromEntries(formData.entries()));
 
   if (!parsed.success) {
-    return { message: "Invalid email or password format." };
+    return { message: "Invalid username or password format." };
   }
 
-  const { email, password } = parsed.data;
+  const { username, password } = parsed.data;
 
   const user = mockUsers.find(
-    (u) => u.email === email && u.password === password
+    (u) => u.email === username && u.password === password
   );
 
   if (!user) {

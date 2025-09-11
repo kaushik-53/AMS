@@ -41,7 +41,7 @@ export const mockClasses: Class[] = [
   { id: 'C12', name: 'Class 12', teacherId: '4' }, // Anjali Gupta as class teacher
 ];
 
-export let mockAttendance: AttendanceRecord[] = [
+export const mockAttendance: AttendanceRecord[] = [
     { id: 'A1', studentId: 's1101', date: '2024-05-20', status: 'present', classId: 'C11' },
     { id: 'A2', studentId: 's1102', date: '2024-05-20', status: 'present', classId: 'C11' },
     { id: 'A3', studentId: 's1103', date: '2024-05-20', status: 'absent', classId: 'C11' },

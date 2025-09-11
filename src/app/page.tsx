@@ -33,8 +33,8 @@ const passwordValidation = new RegExp(
 );
 
 const formSchema = z.object({
-  email: z.string().email({
-    message: "Please enter a valid email address.",
+  username: z.string().min(1, {
+    message: "Please enter your username.",
   }),
   password: z
     .string()
@@ -50,7 +50,7 @@ export default function LoginPage() {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      email: searchParams.get("email") || "",
+      username: searchParams.get("username") || "",
       password: "",
     },
   });
@@ -78,15 +78,14 @@ export default function LoginPage() {
             <form action={formAction} className="space-y-6">
               <FormField
                 control={form.control}
-                name="email"
+                name="username"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Email</FormLabel>
+                    <FormLabel>Username</FormLabel>
                     <FormControl>
                       <Input
-                        placeholder="name@example.com"
+                        placeholder="e.g. admin or class11_roll1"
                         {...field}
-                        type="email"
                       />
                     </FormControl>
                     <FormMessage />
