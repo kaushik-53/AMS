@@ -1,3 +1,4 @@
+
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -61,13 +62,30 @@ export default function LoginPage() {
 
   useEffect(() => {
     if (state?.message) {
-      setErrorMessage(state.message);
+      // Check if the message is a validation error from Zod or an auth error
+      if (
+        state.message.includes("Password") ||
+        state.message.includes("username")
+      ) {
+        // It's a validation error, let the form handle it.
+        // We can check which field is invalid and set the error
+        if (state.message.includes("username")) {
+            form.setError("username", { type: "manual", message: state.message });
+        } else {
+            form.setError("password", { type: "manual", message: state.message });
+        }
+      } else {
+        // It's an authentication error, display it in the alert.
+        setErrorMessage(state.message);
+      }
+
       const timer = setTimeout(() => {
         setErrorMessage("");
+        form.clearErrors();
       }, 5000);
       return () => clearTimeout(timer);
     }
-  }, [state?.message]);
+  }, [state, form]);
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-center p-4">

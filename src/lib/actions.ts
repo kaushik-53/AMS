@@ -1,3 +1,4 @@
+
 "use server";
 
 import { redirect } from "next/navigation";
@@ -7,20 +8,33 @@ import type { User, Class, AttendanceRecord, AttendanceStatus, UserRole, Timetab
 import { sendAbsentEmailNotification } from "@/ai/flows/absent-email-notifications";
 import { revalidatePath } from "next/cache";
 
+const passwordValidation = new RegExp(
+  /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/
+);
+
+const loginSchema = z.object({
+  username: z.string().min(1, { message: "Please enter your username." }),
+  password: z
+    .string()
+    .min(8, { message: "Password must be at least 8 characters long." })
+    .regex(passwordValidation, {
+      message:
+        "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character.",
+    }),
+});
+
+
 // --- Authentication ---
 
 export async function loginAction(
   prevState: { message: string },
   formData: FormData
 ) {
-  const schema = z.object({
-    username: z.string(),
-    password: z.string(),
-  });
-  const parsed = schema.safeParse(Object.fromEntries(formData.entries()));
+  const parsed = loginSchema.safeParse(Object.fromEntries(formData.entries()));
 
   if (!parsed.success) {
-    return { message: "Invalid username or password format." };
+    const error = parsed.error.flatten().fieldErrors.password?.[0];
+    return { message: error || "Invalid username or password format." };
   }
 
   const { username, password } = parsed.data;
