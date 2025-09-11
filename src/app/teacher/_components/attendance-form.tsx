@@ -3,17 +3,10 @@
 import { useEffect, useState, useTransition } from "react";
 import type { User, AttendanceRecord, AttendanceStatus } from "@/lib/types";
 import { Button } from "@/components/ui/button";
-import { Calendar } from "@/components/ui/calendar";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
-import { cn } from "@/lib/utils";
-import { Calendar as CalendarIcon, CheckCircle, XCircle } from "lucide-react";
-import { format, toDate } from "date-fns";
+import { CheckCircle } from "lucide-react";
+import { format } from "date-fns";
 import { getAttendanceByDateAndClass, saveAttendance } from "@/lib/actions";
 import { useToast } from "@/hooks/use-toast";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -33,12 +26,13 @@ export default function AttendanceForm({
   students,
   classId,
   teacherName,
+  selectedDate,
 }: {
   students: User[];
   classId: string;
   teacherName: string;
+  selectedDate: Date;
 }) {
-  const [date, setDate] = useState<Date | undefined>(new Date());
   const [attendance, setAttendance] = useState<AttendanceState>({});
   const [existingRecords, setExistingRecords] = useState<AttendanceRecord[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -55,8 +49,7 @@ export default function AttendanceForm({
   }, [students]);
 
   useEffect(() => {
-    if (!date) return;
-    const formattedDate = format(date, "yyyy-MM-dd");
+    const formattedDate = format(selectedDate, "yyyy-MM-dd");
     setIsLoading(true);
     getAttendanceByDateAndClass(formattedDate, classId).then((records) => {
       setExistingRecords(records);
@@ -76,14 +69,13 @@ export default function AttendanceForm({
       }
       setIsLoading(false);
     });
-  }, [date, classId, students]);
+  }, [selectedDate, classId, students]);
 
   const handleStatusChange = (studentId: string, status: AttendanceStatus) => {
     setAttendance((prev) => ({ ...prev, [studentId]: status }));
   };
 
   const handleSubmit = () => {
-    if (!date) return;
     const attendanceData = Object.entries(attendance).map(
       ([studentId, status]) => ({ studentId, status })
     );
@@ -92,7 +84,7 @@ export default function AttendanceForm({
       const result = await saveAttendance(
         attendanceData,
         classId,
-        format(date, "yyyy-MM-dd"),
+        format(selectedDate, "yyyy-MM-dd"),
         teacherName
       );
       if (result.success) {
@@ -100,7 +92,7 @@ export default function AttendanceForm({
           title: "Attendance Submitted",
           description: "Today's attendance has been recorded.",
         });
-        setExistingRecords(attendanceData.map(ad => ({...ad, id: '', date: format(date, 'yyyy-MM-dd'), classId}))); // Optimistic update
+        setExistingRecords(attendanceData.map(ad => ({...ad, id: '', date: format(selectedDate, 'yyyy-MM-dd'), classId}))); // Optimistic update
       } else {
         toast({
           variant: "destructive",
@@ -115,32 +107,6 @@ export default function AttendanceForm({
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center gap-4">
-        <Popover>
-          <PopoverTrigger asChild>
-            <Button
-              variant={"outline"}
-              className={cn(
-                "w-[280px] justify-start text-left font-normal",
-                !date && "text-muted-foreground"
-              )}
-            >
-              <CalendarIcon className="mr-2 h-4 w-4" />
-              {date ? format(date, "PPP") : <span>Pick a date</span>}
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent className="w-auto p-0">
-            <Calendar
-              mode="single"
-              selected={date}
-              onSelect={setDate}
-              initialFocus
-              disabled={(d) => d > new Date()}
-            />
-          </PopoverContent>
-        </Popover>
-      </div>
-
       {isLoading ? (
         <div className="space-y-4">
             <Skeleton className="h-10 w-full" />
@@ -191,13 +157,13 @@ export default function AttendanceForm({
             <CheckCircle className="h-4 w-4 text-primary"/>
             <AlertTitle className="text-primary">Attendance Already Submitted</AlertTitle>
             <AlertDescription>
-                Attendance for {date ? format(date, 'PPP') : 'this day'} has already been recorded.
+                Attendance for {format(selectedDate, 'PPP')} has already been recorded for this class.
             </AlertDescription>
         </Alert>
       )}
 
       {!isFormSubmittedForDay && (
-        <Button onClick={handleSubmit} disabled={isPending || isLoading}>
+        <Button onClick={handleSubmit} disabled={isPending || isLoading || students.length === 0}>
           {isPending ? "Submitting..." : "Submit Attendance"}
         </Button>
       )}

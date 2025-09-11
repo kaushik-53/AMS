@@ -1,5 +1,4 @@
-import { getUserById, getStudentsByClass, getClasses, getTimetable } from "@/lib/actions";
-import AttendanceForm from "./_components/attendance-form";
+import { getUserById, getClasses, getTimetable } from "@/lib/actions";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { TeacherAttendance } from "./_components/teacher-attendance";
 
@@ -36,6 +35,7 @@ export default async function TeacherDashboardPage({
         <TeacherAttendance 
             teacher={teacher}
             teacherClasses={teacherClasses}
+            timetable={timetable.filter(t => t.teacherId === teacher.id)}
         />
     </div>
   );
