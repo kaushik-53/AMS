@@ -74,13 +74,13 @@ export function TeacherAttendance({ teacher, teacherClasses, timetable }: { teac
                             </Button>
                         </PopoverTrigger>
                         <PopoverContent className="w-auto p-0">
-                            {isClient && <Calendar
+                             <Calendar
                                 mode="single"
                                 selected={date}
                                 onSelect={setDate}
                                 initialFocus
-                                disabled={(d) => d > new Date() || d.getDay() === 0 || d.getDay() === 6}
-                            />}
+                                disabled={(d) => !isClient || d > new Date() || d.getDay() === 0 || d.getDay() === 6}
+                            />
                         </PopoverContent>
                     </Popover>
 
