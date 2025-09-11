@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useMemo } from "react";
@@ -33,13 +34,13 @@ import { exportToCsv } from "@/lib/utils";
 export function AttendanceReport({
   initialRecords,
   students,
-  assignedClass,
+  selectedClass,
 }: {
   initialRecords: AttendanceRecord[];
   students: User[];
-  assignedClass?: Class;
+  selectedClass?: Class;
 }) {
-  const [records, setRecords] = useState(initialRecords);
+  const [records] = useState(initialRecords);
   const [filters, setFilters] = useState({
     studentName: "",
     date: "",
@@ -85,7 +86,7 @@ export function AttendanceReport({
       r.date,
       r.status,
     ]);
-    exportToCsv(`attendance_report_${assignedClass?.name}.csv`, [
+    exportToCsv(`attendance_report_${selectedClass?.name}.csv`, [
         ["Student", "Date", "Status"],
         ...dataToExport
     ]);
@@ -96,7 +97,7 @@ export function AttendanceReport({
     <div className="space-y-6">
       <Card>
         <CardHeader>
-          <CardTitle>Attendance Summary for {assignedClass?.name}</CardTitle>
+          <CardTitle>Attendance Summary for {selectedClass?.name}</CardTitle>
           <CardDescription>
             Overall attendance based on current filters.
           </CardDescription>

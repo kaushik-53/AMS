@@ -1,5 +1,6 @@
-import { getStudentsByClass, getClasses, getUserById, getAttendanceByClass } from "@/lib/actions";
-import { AttendanceReport } from "./_components/attendance-report";
+
+import { getClasses, getUserById, getTimetable, getStudents, getAllAttendance } from "@/lib/actions";
+import { TeacherAttendanceReport } from "./_components/teacher-attendance-report";
 
 export default async function TeacherReportPage({
   searchParams,
@@ -9,20 +10,25 @@ export default async function TeacherReportPage({
   const { userId } = searchParams;
   const teacher = await getUserById(userId);
 
-  if (!teacher || !teacher.classId) {
-    return <p>Could not load teacher or class information.</p>;
+  if (!teacher) {
+    return <p>Could not load teacher information.</p>;
   }
 
-  const students = await getStudentsByClass(teacher.classId);
-  const assignedClass = (await getClasses()).find(c => c.id === teacher.classId);
-  const attendanceRecords = await getAttendanceByClass(teacher.classId);
+  const allStudents = await getStudents();
+  const allAttendanceRecords = await getAllAttendance();
+  const allClasses = await getClasses();
+  const timetable = await getTimetable();
+
+  const teacherClassIds = [...new Set(timetable.filter(t => t.teacherId === teacher.id).map(t => t.classId))];
+  const teacherClasses = allClasses.filter(c => teacherClassIds.includes(c.id));
+
 
   return (
     <div>
-      <AttendanceReport
-        initialRecords={attendanceRecords}
-        students={students}
-        assignedClass={assignedClass}
+      <TeacherAttendanceReport
+        allRecords={allAttendanceRecords}
+        allStudents={allStudents}
+        teacherClasses={teacherClasses}
       />
     </div>
   );
