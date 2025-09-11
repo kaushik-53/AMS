@@ -46,11 +46,10 @@ const formSchema = z.object({
 });
 
 export default function LoginPage() {
-  const searchParams = useSearchParams();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      username: searchParams.get("username") || "",
+      username: "",
       password: "",
     },
   });
@@ -100,7 +99,7 @@ export default function LoginPage() {
                     <FormControl>
                       <Input
                         {...field}
-                        type="text"
+                        type="password"
                       />
                     </FormControl>
                     <FormMessage />
