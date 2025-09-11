@@ -13,7 +13,7 @@ interface TimetableGridProps {
 
 export function TimetableGrid({ title, description, timetable, teachers, classes, highlightTeacherId }: TimetableGridProps) {
   const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
-  const periods = Array.from({ length: 4 }, (_, i) => i + 1); // Assuming 4 periods
+  const periods = Array.from({ length: 2 }, (_, i) => i + 1); // Assuming 2 periods
 
   const getEntry = (day: string, period: number) => {
     return timetable.find(entry => entry.day === day && entry.period === period);
