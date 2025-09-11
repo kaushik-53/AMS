@@ -2,8 +2,8 @@
 
 import { redirect } from "next/navigation";
 import { z } from "zod";
-import { mockUsers, mockClasses, mockAttendance } from "./data";
-import type { User, Class, AttendanceRecord, AttendanceStatus, UserRole } from "./types";
+import { mockUsers, mockClasses, mockAttendance, mockTimetable } from "./data";
+import type { User, Class, AttendanceRecord, AttendanceStatus, UserRole, TimetableEntry } from "./types";
 import { sendAbsentEmailNotification } from "@/ai/flows/absent-email-notifications";
 import { revalidatePath } from "next/cache";
 
@@ -83,6 +83,9 @@ export async function getAttendanceByClass(classId: string): Promise<AttendanceR
     return mockAttendance.filter(a => a.classId === classId);
 }
 
+export async function getTimetable(): Promise<TimetableEntry[]> {
+    return mockTimetable;
+}
 
 // --- Data Mutations ---
 
@@ -131,6 +134,9 @@ export async function saveAttendance(
     revalidatePath("/teacher");
     revalidatePath("/teacher/report");
     revalidatePath("/admin/attendance");
+    revalidatePath("/admin/timetable");
+    revalidatePath("/teacher/timetable");
+    revalidatePath("/student/timetable");
     return { success: true, message: "Attendance saved successfully." };
   } catch (error) {
     return { success: false, message: "Failed to save attendance." };

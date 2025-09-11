@@ -5,7 +5,7 @@ import {
   DashboardLayout,
   type NavItem,
 } from "@/components/dashboard-layout";
-import { ClipboardList, BookCheck } from "lucide-react";
+import { ClipboardList, BookCheck, CalendarDays } from "lucide-react";
 
 const teacherNavItems: NavItem[] = [
   {
@@ -18,6 +18,11 @@ const teacherNavItems: NavItem[] = [
     href: "/teacher/report",
     label: "Attendance Report",
     icon: BookCheck,
+  },
+  {
+    href: "/teacher/timetable",
+    label: "Timetable",
+    icon: CalendarDays,
   },
 ];
 

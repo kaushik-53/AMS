@@ -1,4 +1,4 @@
-import type { User, Class, AttendanceRecord } from './types';
+import type { User, Class, AttendanceRecord, TimetableEntry } from './types';
 
 // In a real app, this would be in a database and passwords would be hashed.
 export const mockUsers: User[] = [
@@ -41,10 +41,30 @@ export const mockClasses: Class[] = [
   { id: 'C12', name: 'Class 12', teacherId: '4' }, // Anjali Gupta as class teacher
 ];
 
-export const mockAttendance: AttendanceRecord[] = [
-    { id: 'A1', studentId: 's1101', date: '2024-05-20', status: 'present', classId: 'C11' },
-    { id: 'A2', studentId: 's1102', date: '2024-05-20', status: 'present', classId: 'C11' },
-    { id: 'A3', studentId: 's1103', date: '2024-05-20', status: 'absent', classId: 'C11' },
-    { id: 'A4', studentId: 's1201', date: '2024-05-20', status: 'present', classId: 'C12' },
-    { id: 'A5', studentId: 's1202', date: '2024-05-20', status: 'absent', classId: 'C12' },
+export const mockAttendance: AttendanceRecord[] = [];
+
+export const mockTimetable: TimetableEntry[] = [
+    // Class 11
+    { id: 'tt1', classId: 'C11', day: 'Monday', period: 1, subject: 'English', teacherId: '2' },
+    { id: 'tt2', classId: 'C11', day: 'Monday', period: 2, subject: 'Physics', teacherId: '3' },
+    { id: 'tt3', classId: 'C11', day: 'Tuesday', period: 1, subject: 'Maths', teacherId: '5' },
+    { id: 'tt4', classId: 'C11', day: 'Tuesday', period: 2, subject: 'Chemistry', teacherId: '4' },
+    { id: 'tt5', classId: 'C11', day: 'Wednesday', period: 1, subject: 'Physics', teacherId: '3' },
+    { id: 'tt6', classId: 'C11', day: 'Wednesday', period: 2, subject: 'English', teacherId: '2' },
+    { id: 'tt7', classId: 'C11', day: 'Thursday', period: 1, subject: 'Chemistry', teacherId: '4' },
+    { id: 'tt8', classId: 'C11', day: 'Thursday', period: 2, subject: 'Maths', teacherId: '5' },
+    { id: 'tt9', classId: 'C11', day: 'Friday', period: 1, subject: 'English', teacherId: '2' },
+    { id: 'tt10', classId: 'C11', day: 'Friday', period: 2, subject: 'Physics', teacherId: '3' },
+
+    // Class 12
+    { id: 'tt11', classId: 'C12', day: 'Monday', period: 1, subject: 'Maths', teacherId: '5' },
+    { id: 'tt12', classId: 'C12', day: 'Monday', period: 2, subject: 'Chemistry', teacherId: '4' },
+    { id: 'tt13', classId: 'C12', day: 'Tuesday', period: 1, subject: 'English', teacherId: '2' },
+    { id: 'tt14', classId: 'C12', day: 'Tuesday', period: 2, subject: 'Physics', teacherId: '3' },
+    { id: 'tt15', classId: 'C12', day: 'Wednesday', period: 1, subject: 'Chemistry', teacherId: '4' },
+    { id: 'tt16', classId: 'C12', day: 'Wednesday', period: 2, subject: 'Maths', teacherId: '5' },
+    { id: 'tt17', classId: 'C12', day: 'Thursday', period: 1, subject: 'Physics', teacherId: '3' },
+    { id: 'tt18', classId: 'C12', day: 'Thursday', period: 2, subject: 'English', teacherId: '2' },
+    { id: 'tt19', classId: 'C12', day: 'Friday', period: 1, subject: 'Maths', teacherId: '5' },
+    { id: 'tt20', classId: 'C12', day: 'Friday', period: 2, subject: 'Chemistry', teacherId: '4' },
 ];

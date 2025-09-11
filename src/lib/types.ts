@@ -16,7 +16,7 @@ export interface User {
 }
 
 export interface Class {
-  id: string;
+  id:string;
   name: string;
   teacherId: string;
 }
@@ -29,4 +29,13 @@ export interface AttendanceRecord {
   date: string; // YYYY-MM-DD
   status: AttendanceStatus;
   classId: string;
+}
+
+export interface TimetableEntry {
+    id: string;
+    classId: string;
+    day: 'Monday' | 'Tuesday' | 'Wednesday' | 'Thursday' | 'Friday';
+    period: number;
+    subject: string;
+    teacherId: string;
 }
