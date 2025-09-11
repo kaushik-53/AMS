@@ -84,7 +84,6 @@ export default function LoginPage() {
                     <FormLabel>Username</FormLabel>
                     <FormControl>
                       <Input
-                        placeholder="e.g. admin or class11_roll1"
                         {...field}
                       />
                     </FormControl>
@@ -100,9 +99,8 @@ export default function LoginPage() {
                     <FormLabel>Password</FormLabel>
                     <FormControl>
                       <Input
-                        placeholder="••••••••"
                         {...field}
-                        type="password"
+                        type="text"
                       />
                     </FormControl>
                     <FormMessage />
