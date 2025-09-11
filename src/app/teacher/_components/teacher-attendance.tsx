@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import type { User, Class } from "@/lib/types";
 import { getStudentsByClass } from "@/lib/actions";
 import AttendanceForm from "./attendance-form";
@@ -18,11 +18,11 @@ export function TeacherAttendance({ teacher, teacherClasses }: { teacher: User, 
     }
     
     // Initial load of students for the default selected class
-    useState(() => {
+    useEffect(() => {
         if (selectedClassId) {
             handleClassChange(selectedClassId);
         }
-    });
+    }, [selectedClassId]);
 
     const selectedClass = teacherClasses.find(c => c.id === selectedClassId);
 
