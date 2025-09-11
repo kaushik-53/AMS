@@ -19,6 +19,11 @@ export function TeacherAttendance({ teacher, teacherClasses, timetable }: { teac
     const [date, setDate] = useState<Date | undefined>(new Date());
     const [selectedClassId, setSelectedClassId] = useState<string | null>(null);
     const [students, setStudents] = useState<User[]>([]);
+    const [isClient, setIsClient] = useState(false);
+
+    useEffect(() => {
+        setIsClient(true);
+    }, []);
 
     const classesForSelectedDay = useMemo(() => {
         if (!date) return [];
@@ -69,13 +74,13 @@ export function TeacherAttendance({ teacher, teacherClasses, timetable }: { teac
                             </Button>
                         </PopoverTrigger>
                         <PopoverContent className="w-auto p-0">
-                            <Calendar
-                            mode="single"
-                            selected={date}
-                            onSelect={setDate}
-                            initialFocus
-                            disabled={(d) => d > new Date() || d.getDay() === 0 || d.getDay() === 6}
-                            />
+                            {isClient && <Calendar
+                                mode="single"
+                                selected={date}
+                                onSelect={setDate}
+                                initialFocus
+                                disabled={(d) => d > new Date() || d.getDay() === 0 || d.getDay() === 6}
+                            />}
                         </PopoverContent>
                     </Popover>
 
