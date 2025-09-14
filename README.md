@@ -51,9 +51,16 @@ The application will be available at `http://localhost:9002`.
 
 **In the second terminal, run the Genkit server:**
 
+For standard development, you can run:
 ```bash
 npm run genkit:dev
 ```
+
+If you are actively developing the AI flows, it is recommended to use the `watch` command, which will automatically restart the server when you make changes to the files in the `src/ai` directory:
+```bash
+npm run genkit:watch
+```
+
 This will start the Genkit development server, allowing the AI features of the application to function correctly.
 
 You are now all set up to run and develop the EduTrack application locally!
