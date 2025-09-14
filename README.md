@@ -6,7 +6,7 @@ This is a Next.js starter project for EduTrack, a modern attendance management s
 
 Before you begin, ensure you have the following installed on your local machine:
 - [Node.js](https://nodejs.org/) (v18 or later recommended)
-- [npm](https://www.npmjs.com/) (usually comes with Node.js)
+- [npm](https://www.npmjs.com/) (which is included when you install Node.js)
 
 ## Getting Started
 
@@ -14,7 +14,7 @@ Follow these steps to get the project running on your local machine.
 
 ### 1. Install Dependencies
 
-First, install the necessary project dependencies using npm:
+To install all the required packages for the project, navigate to the root directory of the project in your terminal and run the following command. This will download all the dependencies listed in the `package.json` file into a `node_modules` folder.
 
 ```bash
 npm install
