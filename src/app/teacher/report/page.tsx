@@ -19,11 +19,19 @@ export default async function TeacherReportPage({
   const allClasses = await getClasses();
   const timetable = await getTimetable();
 
-  const teacherClassIds = [...new Set(timetable.filter(t => t.teacherId === teacher.id).map(t => t.classId))];
+  // Get class IDs from timetable
+  const classIdsFromTimetable = timetable.filter(t => t.teacherId === teacher.id).map(t => t.classId);
+  
+  // Get class IDs where the teacher is the main class teacher
+  const classIdsFromClassList = allClasses.filter(c => c.teacherId === teacher.id).map(c => c.id);
+
+  // Combine and get unique class IDs
+  const teacherClassIds = [...new Set([...classIdsFromTimetable, ...classIdsFromClassList])];
+
   const teacherClasses = allClasses.filter(c => teacherClassIds.includes(c.id));
 
   // Filter records and students to only those in the teacher's classes
-  const recordsForTeacherClasses = allAttendanceRecords.filter(r => teacherClassIds.includes(r.classId));
+  const recordsForTeacherClasses = allAttendanceRecords.filter(r => r.classId && teacherClassIds.includes(r.classId));
   const studentsForTeacherClasses = allStudents.filter(s => s.classId && teacherClassIds.includes(s.classId));
 
 
