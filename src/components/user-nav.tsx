@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
@@ -15,19 +14,25 @@ import { getUserById, logoutAction } from "@/lib/actions";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import type { User } from "@/lib/types";
-import { LogOut, User as UserIcon } from "lucide-react";
+import { LogOut } from "lucide-react";
 import { PlaceHolderImages } from "@/lib/placeholder-images";
+import { Skeleton } from "./ui/skeleton";
 
 export function UserNav() {
   const [user, setUser] = useState<User | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
   const searchParams = useSearchParams();
 
   useEffect(() => {
     const userId = searchParams.get("userId");
     if (userId) {
+      setIsLoading(true);
       getUserById(userId).then((userData) => {
         if (userData) setUser(userData);
+        setIsLoading(false);
       });
+    } else {
+        setIsLoading(false);
     }
   }, [searchParams]);
 
@@ -44,8 +49,20 @@ export function UserNav() {
     if (names.length > 1) {
       return `${names[0][0]}${names[names.length - 1][0]}`;
     }
-    return names[0].substring(0, 2);
+    return name.substring(0, 2);
   };
+
+  if (isLoading) {
+    return (
+        <div className="flex items-center gap-2 p-2">
+            <Skeleton className="h-8 w-8 rounded-full" />
+            <div className="flex flex-col gap-1">
+                <Skeleton className="h-4 w-24" />
+                <Skeleton className="h-3 w-32" />
+            </div>
+        </div>
+    );
+  }
 
   if (!user) {
     return null;

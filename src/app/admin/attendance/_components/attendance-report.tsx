@@ -32,7 +32,7 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
-import { Bar, BarChart, XAxis, YAxis, CartesianGrid } from "recharts";
+import { Bar, BarChart, XAxis, YAxis, CartesianGrid, Cell } from "recharts";
 import { Button } from "@/components/ui/button";
 import { FileDown } from "lucide-react";
 import { exportToCsv } from "@/lib/utils";
@@ -46,7 +46,7 @@ export function AttendanceReport({
   students: User[];
   classes: Class[];
 }) {
-  const [records, setRecords] = useState(initialRecords);
+  const [records] = useState(initialRecords);
   const [filters, setFilters] = useState({
     studentName: "",
     classId: "all",
@@ -84,8 +84,6 @@ export function AttendanceReport({
   const attendanceSummary = useMemo(() => {
     const present = filteredRecords.filter((r) => r.status === "present").length;
     const absent = filteredRecords.filter((r) => r.status === "absent").length;
-    const total = filteredRecords.length;
-    const percentage = total > 0 ? ((present / total) * 100).toFixed(1) : "0";
     return [
       { status: "Present", count: present, fill: "hsl(var(--chart-2))" },
       { status: "Absent", count: absent, fill: "hsl(var(--destructive))" },
@@ -137,7 +135,7 @@ export function AttendanceReport({
               />
               <Bar dataKey="count" radius={5}>
                 {attendanceSummary.map((entry, index) => (
-                    <rect key={`cell-${index}`} fill={entry.fill} />
+                    <Cell key={`cell-${index}`} fill={entry.fill} />
                 ))}
               </Bar>
             </BarChart>

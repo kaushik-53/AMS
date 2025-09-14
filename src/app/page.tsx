@@ -4,8 +4,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
-import { useSearchParams } from "next/navigation";
-import { useActionState, useEffect, useState } from "react";
+import { useActionState, useEffect } from "react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -47,7 +46,6 @@ const formSchema = z.object({
 });
 
 export default function LoginPage() {
-  const [errorMessage, setErrorMessage] = useState("");
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -62,28 +60,14 @@ export default function LoginPage() {
 
   useEffect(() => {
     if (state?.message) {
-      // Check if the message is a validation error from Zod or an auth error
-      if (
-        state.message.includes("Password") ||
-        state.message.includes("username")
-      ) {
-        // It's a validation error, let the form handle it.
-        // We can check which field is invalid and set the error
-        if (state.message.includes("username")) {
-            form.setError("username", { type: "manual", message: state.message });
-        } else {
-            form.setError("password", { type: "manual", message: state.message });
-        }
+      if (state.message.includes("username")) {
+        form.setError("username", { type: "manual", message: state.message });
+      } else if (state.message.includes("Password")) {
+        form.setError("password", { type: "manual", message: state.message });
       } else {
-        // It's an authentication error, display it in the alert.
-        setErrorMessage(state.message);
+        // It's a general auth error, show in the alert.
+        form.setError("root.auth", { type: "manual", message: state.message });
       }
-
-      const timer = setTimeout(() => {
-        setErrorMessage("");
-        form.clearErrors();
-      }, 5000);
-      return () => clearTimeout(timer);
     }
   }, [state, form]);
 
@@ -135,11 +119,13 @@ export default function LoginPage() {
                   </FormItem>
                 )}
               />
-              {errorMessage && (
+              {form.formState.errors.root?.auth && (
                 <Alert variant="destructive">
                   <Terminal className="h-4 w-4" />
                   <AlertTitle>Authentication Failed</AlertTitle>
-                  <AlertDescription>{errorMessage}</AlertDescription>
+                  <AlertDescription>
+                    {form.formState.errors.root.auth.message}
+                  </AlertDescription>
                 </Alert>
               )}
               <Button type="submit" className="w-full">

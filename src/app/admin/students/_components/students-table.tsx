@@ -88,7 +88,7 @@ export function StudentsTable({
   const { toast } = useToast();
 
   const studentsByClass = useMemo(() => {
-    return initialStudents.reduce((acc, student) => {
+    return students.reduce((acc, student) => {
       const classId = student.classId || 'unassigned';
       if (!acc[classId]) {
         acc[classId] = [];
@@ -96,7 +96,7 @@ export function StudentsTable({
       acc[classId].push(student);
       return acc;
     }, {} as Record<string, User[]>);
-  }, [initialStudents]);
+  }, [students]);
 
   const form = useForm<StudentFormValues>({
     resolver: zodResolver(studentFormSchema),
@@ -141,6 +141,15 @@ export function StudentsTable({
     if (result.success) {
         if (editingStudent) {
             setStudents(students.map(s => s.id === editingStudent.id ? {...s, ...values, id: s.id} : s));
+        } else {
+            // Optimistic update for new student
+            const newStudent: User = { 
+                ...values,
+                id: `new-${Math.random()}`,
+                role: 'student', 
+                avatarId: `${(students.length % 7) + 1}`
+            };
+            setStudents([...students, newStudent]);
         }
         toast({ title: "Success", description: result.message });
     } else {
@@ -261,14 +270,15 @@ export function StudentsTable({
         <CardContent>
           <Accordion type="multiple" defaultValue={classes.map(c => c.id)} className="w-full">
             {classes.map((c) => (
+              studentsByClass[c.id] && studentsByClass[c.id].length > 0 &&
               <AccordionItem value={c.id} key={c.id}>
                 <AccordionTrigger className="text-lg font-medium">{c.name}</AccordionTrigger>
                 <AccordionContent>
-                  {studentsByClass[c.id] ? renderStudentTable(studentsByClass[c.id]) : <p className="p-4 text-muted-foreground">No students in this class.</p>}
+                  {renderStudentTable(studentsByClass[c.id])}
                 </AccordionContent>
               </AccordionItem>
             ))}
-            {studentsByClass['unassigned'] && (
+            {studentsByClass['unassigned'] && studentsByClass['unassigned'].length > 0 && (
                <AccordionItem value="unassigned">
                 <AccordionTrigger className="text-lg font-medium">Unassigned Students</AccordionTrigger>
                 <AccordionContent>
@@ -325,6 +335,7 @@ export function StudentsTable({
                     <Select onValueChange={field.onChange} defaultValue={field.value}>
                         <FormControl><SelectTrigger><SelectValue placeholder="Select a class" /></SelectTrigger></FormControl>
                         <SelectContent>
+                            <SelectItem value="">Unassign</SelectItem>
                             {classes.map(c => <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>)}
                         </SelectContent>
                     </Select>
