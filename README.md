@@ -35,32 +35,20 @@ The project uses Genkit with the Google AI plugin for its AI features, which req
 
 ### 3. Run the Development Servers
 
-This project requires two separate development servers to be running at the same time:
+This project requires two separate development servers to be running concurrently. You will need to open two separate terminal windows (or tabs) for these commands.
 
-1.  **Next.js Development Server:** This runs the main web application.
-2.  **Genkit Development Server:** This runs the backend AI flows.
-
-Open two separate terminal windows or tabs and run the following commands:
-
-**In the first terminal, run the Next.js app:**
+**In your first terminal, run the Next.js app:**
 
 ```bash
 npm run dev
 ```
-The application will be available at `http://localhost:9002`.
+Wait for the command to output `✓ Ready in...`. The application will then be available at `http://localhost:9002`. This server will continue to run.
 
-**In the second terminal, run the Genkit server:**
+**In a second, separate terminal, run the Genkit server:**
 
-For standard development, you can run:
-```bash
-npm run genkit:dev
-```
-
-If you are actively developing the AI flows, it is recommended to use the `watch` command, which will automatically restart the server when you make changes to the files in the `src/ai` directory:
 ```bash
 npm run genkit:watch
 ```
+This will start the Genkit development server, which handles the application's AI features. Using the `watch` command is recommended, as it will automatically restart the server when you make changes to files in the `src/ai` directory.
 
-This will start the Genkit development server, allowing the AI features of the application to function correctly.
-
-You are now all set up to run and develop the EduTrack application locally!
+With both terminals running, your local development environment is now fully set up!
