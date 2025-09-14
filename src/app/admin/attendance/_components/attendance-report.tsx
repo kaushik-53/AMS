@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useMemo } from "react";
@@ -206,7 +207,7 @@ export function AttendanceReport({
                         {record.status === "present" ? (
                           <Badge
                             variant="secondary"
-                            className="bg-green-100 text-green-800 border-green-200"
+                            className="bg-green-100 text-green-800 border-green-200 dark:bg-green-900/50 dark:text-green-300 dark:border-green-800"
                           >
                             <CheckCircle className="mr-1 h-3 w-3" />
                             Present

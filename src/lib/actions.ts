@@ -179,7 +179,7 @@ export async function saveStudent(studentData: { id?: string; name: string; emai
     return upsertUser({ ...studentData, role: 'student' });
 }
 
-export async function saveTeacher(teacherData: { id?: string; name: string; email: string; classId: string; }) {
+export async function saveTeacher(teacherData: { id?: string; name: string; email: string; classId: string; subject?: string; }) {
     return upsertUser({ ...teacherData, role: 'teacher' });
 }
 

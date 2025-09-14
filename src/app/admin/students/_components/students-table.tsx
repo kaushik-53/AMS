@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useMemo } from "react";
@@ -268,7 +269,7 @@ export function StudentsTable({
           </div>
         </CardHeader>
         <CardContent>
-          <Accordion type="multiple" defaultValue={classes.map(c => c.id)} className="w-full">
+          <Accordion type="multiple" defaultValue={[...classes.map(c => c.id), 'unassigned']} className="w-full">
             {classes.map((c) => (
               studentsByClass[c.id] && studentsByClass[c.id].length > 0 &&
               <AccordionItem value={c.id} key={c.id}>

@@ -60,14 +60,7 @@ export default function LoginPage() {
 
   useEffect(() => {
     if (state?.message) {
-      if (state.message.includes("username")) {
-        form.setError("username", { type: "manual", message: state.message });
-      } else if (state.message.includes("Password")) {
-        form.setError("password", { type: "manual", message: state.message });
-      } else {
-        // It's a general auth error, show in the alert.
         form.setError("root.auth", { type: "manual", message: state.message });
-      }
     }
   }, [state, form]);
 
