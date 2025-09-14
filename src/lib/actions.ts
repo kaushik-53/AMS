@@ -148,9 +148,7 @@ export async function saveAttendance(
     revalidatePath("/teacher");
     revalidatePath("/teacher/report");
     revalidatePath("/admin/attendance");
-    revalidatePath("/admin/timetable");
-    revalidatePath("/teacher/timetable");
-    revalidatePath("/student/timetable");
+    revalidatePath("/admin");
     return { success: true, message: "Attendance saved successfully." };
   } catch (error) {
     return { success: false, message: "Failed to save attendance." };
