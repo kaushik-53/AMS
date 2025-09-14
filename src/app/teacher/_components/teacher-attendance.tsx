@@ -16,13 +16,14 @@ import { Calendar } from "@/components/ui/calendar";
 const dayMap = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
 export function TeacherAttendance({ teacher, teacherClasses, timetable }: { teacher: User, teacherClasses: Class[], timetable: TimetableEntry[] }) {
-    const [date, setDate] = useState<Date | undefined>(new Date());
+    const [date, setDate] = useState<Date | undefined>(undefined);
     const [selectedClassId, setSelectedClassId] = useState<string | null>(null);
     const [students, setStudents] = useState<User[]>([]);
     const [isClient, setIsClient] = useState(false);
 
     useEffect(() => {
         setIsClient(true);
+        setDate(new Date());
     }, []);
 
     const classesForSelectedDay = useMemo(() => {
@@ -107,7 +108,7 @@ export function TeacherAttendance({ teacher, teacherClasses, timetable }: { teac
                 ) : (
                     <div className="text-muted-foreground pt-4 text-center border-t mt-4">
                         {!date ? "Please select a date." :
-                         classesForSelectedDay.length === 0 ? `You have no classes scheduled for ${format(date, "PPP")}.` :
+                         classesForSelectedDay.length === 0 && isClient ? `You have no classes scheduled for ${format(date, "PPP")}.` :
                          "Please select a class to start marking attendance."
                         }
                     </div>

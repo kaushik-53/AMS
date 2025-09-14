@@ -8,10 +8,10 @@ interface TimetableGridProps {
   timetable: TimetableEntry[];
   teachers: User[];
   classes: Class[];
-  highlightTeacherId?: string;
+  userId?: string;
 }
 
-export function TimetableGrid({ title, description, timetable, teachers, classes, highlightTeacherId }: TimetableGridProps) {
+export function TimetableGrid({ title, description, timetable, teachers, classes, userId }: TimetableGridProps) {
   const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
   const periods = Array.from({ length: 2 }, (_, i) => i + 1); // Assuming 2 periods
 
@@ -26,6 +26,8 @@ export function TimetableGrid({ title, description, timetable, teachers, classes
   const getClassName = (classId: string) => {
     return classes.find(c => c.id === classId)?.name || 'N/A';
   }
+
+  const isTeacherTimetable = !!(userId && teachers.some(t => t.id === userId));
 
   return (
     <Card>
@@ -48,16 +50,15 @@ export function TimetableGrid({ title, description, timetable, teachers, classes
                   <TableCell className="font-medium">Period {period}</TableCell>
                   {days.map(day => {
                     const entry = getEntry(day, period);
-                    const isHighlighted = highlightTeacherId && entry?.teacherId === highlightTeacherId;
+                    const isHighlighted = isTeacherTimetable && entry?.teacherId === userId;
                     return (
                       <TableCell key={day}>
                         {entry ? (
                           <div className={`p-2 rounded-md ${isHighlighted ? 'bg-primary/20' : 'bg-muted/50'}`}>
                             <p className="font-semibold">{entry.subject}</p>
                             <p className="text-xs text-muted-foreground">
-                                {getTeacherName(entry.teacherId)}
+                                {isTeacherTimetable ? getClassName(entry.classId) : getTeacherName(entry.teacherId)}
                             </p>
-                            {highlightTeacherId && <p className="text-xs text-muted-foreground">{getClassName(entry.classId)}</p>}
                           </div>
                         ) : (
                           '-'

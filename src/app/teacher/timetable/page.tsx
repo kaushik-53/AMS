@@ -21,7 +21,7 @@ export default async function TeacherTimetablePage({ searchParams }: { searchPar
                 timetable={timetable}
                 teachers={allTeachers}
                 classes={allClasses}
-                highlightTeacherId={teacher.id}
+                userId={teacher.id}
             />
         </div>
     )
