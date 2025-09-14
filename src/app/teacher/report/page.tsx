@@ -22,12 +22,16 @@ export default async function TeacherReportPage({
   const teacherClassIds = [...new Set(timetable.filter(t => t.teacherId === teacher.id).map(t => t.classId))];
   const teacherClasses = allClasses.filter(c => teacherClassIds.includes(c.id));
 
+  // Filter records and students to only those in the teacher's classes
+  const recordsForTeacherClasses = allAttendanceRecords.filter(r => teacherClassIds.includes(r.classId));
+  const studentsForTeacherClasses = allStudents.filter(s => s.classId && teacherClassIds.includes(s.classId));
+
 
   return (
     <div>
       <TeacherAttendanceReport
-        allRecords={allAttendanceRecords}
-        allStudents={allStudents}
+        allRecords={recordsForTeacherClasses}
+        allStudents={studentsForTeacherClasses}
         teacherClasses={teacherClasses}
       />
     </div>
