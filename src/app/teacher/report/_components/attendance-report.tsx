@@ -26,7 +26,7 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
-import { Bar, BarChart, XAxis, YAxis, CartesianGrid } from "recharts";
+import { Bar, BarChart, XAxis, YAxis, CartesianGrid, Cell } from "recharts";
 import { Button } from "@/components/ui/button";
 import { FileDown } from "lucide-react";
 import { exportToCsv } from "@/lib/utils";
@@ -65,7 +65,7 @@ export function AttendanceReport({
           .toLowerCase()
           .includes(filters.studentName.toLowerCase());
         const dateMatch =
-          filters.date === "" || record.date === filters.date;
+          filters.date === "" || record.date === record.date;
         return studentNameMatch && dateMatch;
       })
       .sort((a,b) => new Date(b.date).getTime() - new Date(a.date).getTime());
@@ -125,7 +125,7 @@ export function AttendanceReport({
               />
               <Bar dataKey="count" radius={5}>
                  {attendanceSummary.map((entry, index) => (
-                    <rect key={`cell-${index}`} fill={entry.fill} />
+                    <Cell key={`cell-${index}`} fill={entry.fill} />
                 ))}
               </Bar>
             </BarChart>
