@@ -1,3 +1,4 @@
+
 import { getAttendanceForStudent, getUserById, getClasses } from "@/lib/actions";
 import {
   Card,
@@ -21,7 +22,7 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
-import { Bar, BarChart, XAxis, YAxis, CartesianGrid, Cell } from "recharts";
+import { Bar, BarChart, CartesianGrid, XAxis, YAxis, Cell } from "recharts";
 
 export default async function StudentDashboardPage({
   searchParams,
