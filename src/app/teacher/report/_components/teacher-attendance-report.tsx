@@ -26,14 +26,12 @@ export function TeacherAttendanceReport({
         if (!selectedClassId) return [];
         return allRecords.filter(r => r.classId === selectedClassId);
     }, [selectedClassId, allRecords]);
+    
+    const studentsForClass = useMemo(() => {
+        if (!selectedClassId) return [];
+        return allStudents.filter(s => s.classId === selectedClassId);
+    }, [selectedClassId, allStudents]);
 
-    // The bug was here. We need all students from all of the teacher's classes,
-    // not just the currently selected one, because the AttendanceReport component
-    // will do the final filtering based on the records.
-    const studentsInAllTeacherClasses = useMemo(() => {
-        const teacherClassIds = teacherClasses.map(c => c.id);
-        return allStudents.filter(s => s.classId && teacherClassIds.includes(s.classId));
-    }, [teacherClasses, allStudents]);
 
     return (
         <Card>
@@ -58,7 +56,7 @@ export function TeacherAttendanceReport({
                 {selectedClassId ? (
                     <AttendanceReport 
                         initialRecords={recordsForClass}
-                        students={studentsInAllTeacherClasses}
+                        students={studentsForClass}
                         selectedClass={selectedClass}
                     />
                 ) : (
