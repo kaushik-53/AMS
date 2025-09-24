@@ -27,6 +27,8 @@ export function TeacherAttendanceReport({
         return allRecords.filter(r => r.classId === selectedClassId);
     }, [selectedClassId, allRecords]);
     
+    // Corrected Logic: The component already receives all necessary students via props.
+    // The filtering should happen here to pass only the relevant students for the selected class.
     const studentsForClass = useMemo(() => {
         if (!selectedClassId) return [];
         return allStudents.filter(s => s.classId === selectedClassId);
