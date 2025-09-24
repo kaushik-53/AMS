@@ -65,7 +65,7 @@ export function AttendanceReport({
           .toLowerCase()
           .includes(filters.studentName.toLowerCase());
         const dateMatch =
-          filters.date === "" || record.date === record.date;
+          filters.date === "" || record.date === filters.date;
         return studentNameMatch && dateMatch;
       })
       .sort((a,b) => new Date(b.date).getTime() - new Date(a.date).getTime());
