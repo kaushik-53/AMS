@@ -1,18 +1,26 @@
 import type { User, Class, AttendanceRecord, TimetableEntry } from './types';
 
 // In a real app, this would be in a database and passwords would be hashed.
-let mockUsers: User[] = [];
-let mockClasses: Class[] = [];
-let mockAttendance: AttendanceRecord[] = [];
-let mockTimetable: TimetableEntry[] = [];
+
+// To prevent data from being reset on every hot-reload in development,
+// we'll store the mock data on the global object.
+// In a real app, you'd use a database.
+type AppGlobal = typeof globalThis & {
+  mockUsers?: User[];
+  mockClasses?: Class[];
+  mockAttendance?: AttendanceRecord[];
+  mockTimetable?: TimetableEntry[];
+};
+
+const appGlobal = globalThis as AppGlobal;
 
 function initializeMockData() {
   // Only initialize if the data is not already populated
-  if (mockUsers.length > 0) {
+  if (appGlobal.mockUsers && appGlobal.mockUsers.length > 0) {
     return;
   }
 
-  mockUsers = [
+  appGlobal.mockUsers = [
     // Admin
     { id: '1', name: 'Rohan Sharma', email: 'admin', role: 'admin', avatarId: '1', password: 'Admin@123' },
     
@@ -47,14 +55,14 @@ function initializeMockData() {
     { id: 's1210', name: 'Ishita Prasad', email: 'class12_roll10', role: 'student', grade: 12, parentEmail: 'parent1210@example.com', avatarId: '4', password: 'Student@1210', classId: 'C12' },
   ];
   
-  mockClasses = [
+  appGlobal.mockClasses = [
     { id: 'C11', name: 'Class 11', teacherId: '2' }, // Priya Mehta as class teacher
     { id: 'C12', name: 'Class 12', teacherId: '4' }, // Anjali Gupta as class teacher
   ];
   
-  mockAttendance = [];
+  appGlobal.mockAttendance = [];
   
-  mockTimetable = [
+  appGlobal.mockTimetable = [
       // Class 11
       { id: 'tt1', classId: 'C11', day: 'Monday', period: 1, subject: 'English', teacherId: '2' },
       { id: 'tt2', classId: 'C11', day: 'Monday', period: 2, subject: 'Physics', teacherId: '3' },
@@ -75,7 +83,7 @@ function initializeMockData() {
       { id: 'tt15', classId: 'C12', day: 'Wednesday', period: 1, subject: 'Chemistry', teacherId: '4' },
       { id: 'tt16', classId: 'C12', day: 'Wednesday', period: 2, subject: 'Maths', teacherId: '5' },
       { id: 'tt17', classId: 'C12', day: 'Thursday', period: 1, subject: 'Physics', teacherId: '3' },
-      { id: 'tt18', classId: 'C12', day: 'Thursday', period: 2, subject: 'English', teacherId: '2' },
+      { id: 'tt18', classId: 'C12' , day: 'Thursday', period: 2, subject: 'English', teacherId: '2' },
       { id: 'tt19', classId: 'C12', day: 'Friday', period: 1, subject: 'Maths', teacherId: '5' },
       { id: 'tt20', classId: 'C12', day: 'Friday', period: 2, subject: 'Chemistry', teacherId: '4' },
   ];
@@ -84,4 +92,8 @@ function initializeMockData() {
 // Call the initialization function.
 initializeMockData();
 
-export { mockUsers, mockClasses, mockAttendance, mockTimetable };
+
+export const mockUsers: User[] = appGlobal.mockUsers!;
+export const mockClasses: Class[] = appGlobal.mockClasses!;
+export const mockAttendance: AttendanceRecord[] = appGlobal.mockAttendance!;
+export const mockTimetable: TimetableEntry[] = appGlobal.mockTimetable!;
