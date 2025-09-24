@@ -31,9 +31,11 @@ export default async function TeacherReportPage({
 
   const teacherClasses = allClasses.filter(c => teacherClassIds.includes(c.id));
 
-  // Filter records and students to only those in the teacher's classes
+  // Filter records to only those in the teacher's classes
   const recordsForTeacherClasses = allAttendanceRecords.filter(r => r.classId && teacherClassIds.includes(r.classId));
+  
   // Correctly gather ALL students from the teacher's classes to pass to the client component.
+  // The client component will handle filtering per-class.
   const studentsForTeacherClasses = allStudents.filter(s => s.classId && teacherClassIds.includes(s.classId));
 
 
