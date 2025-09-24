@@ -16,7 +16,12 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { CheckCircle, XCircle } from "lucide-react";
-import { Progress } from "@/components/ui/progress";
+import {
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+} from "@/components/ui/chart";
+import { Bar, BarChart, XAxis, YAxis, CartesianGrid, Cell } from "recharts";
 
 export default async function StudentDashboardPage({
   searchParams,
@@ -36,8 +41,14 @@ export default async function StudentDashboardPage({
   const presentDays = attendanceRecords.filter(
     (r) => r.status === "present"
   ).length;
+  const absentDays = totalDays - presentDays;
   const attendancePercentage =
     totalDays > 0 ? Math.round((presentDays / totalDays) * 100) : 0;
+  
+  const attendanceSummary = [
+      { status: "Present", count: presentDays, fill: "hsl(var(--chart-2))" },
+      { status: "Absent", count: absentDays, fill: "hsl(var(--destructive))" },
+    ];
 
   return (
     <div className="space-y-6">
@@ -45,14 +56,37 @@ export default async function StudentDashboardPage({
         <CardHeader>
           <CardTitle>Attendance Summary</CardTitle>
           <CardDescription>
-            Your overall attendance percentage is {attendancePercentage}%.
+            Your overall attendance is {attendancePercentage}%.
           </CardDescription>
         </CardHeader>
-        <CardContent>
-          <div className="flex items-center gap-4">
-            <Progress value={attendancePercentage} className="w-[60%]" />
-            <span className="font-bold text-lg">{attendancePercentage}%</span>
-          </div>
+        <CardContent className="h-[250px]">
+          <ChartContainer config={{}} className="h-full w-full">
+            <BarChart
+              data={attendanceSummary}
+              layout="vertical"
+              margin={{ left: 10, right: 30 }}
+            >
+              <CartesianGrid horizontal={false} />
+              <XAxis type="number" hide />
+              <YAxis
+                dataKey="status"
+                type="category"
+                tickLine={false}
+                axisLine={false}
+                tickMargin={10}
+                className="text-sm"
+              />
+              <ChartTooltip
+                cursor={false}
+                content={<ChartTooltipContent hideLabel />}
+              />
+              <Bar dataKey="count" radius={5}>
+                {attendanceSummary.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={entry.fill} />
+                ))}
+              </Bar>
+            </BarChart>
+          </ChartContainer>
         </CardContent>
       </Card>
       <Card>
