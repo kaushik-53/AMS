@@ -52,3 +52,43 @@ npm run genkit:watch
 This will start the Genkit development server, which handles the application's AI features. Using the `watch` command is recommended, as it will automatically restart the server when you make changes to files in the `src/ai` directory.
 
 With both terminals running, your local development environment is now fully set up!
+
+## Deploying to Firebase App Hosting
+
+You can deploy this application to the internet using [Firebase App Hosting](https://firebase.google.com/docs/hosting/app-hosting).
+
+### 1. Install the Firebase CLI
+
+If you haven't already, install the Firebase Command Line Interface (CLI) globally on your machine:
+
+```bash
+npm install -g firebase-tools
+```
+
+### 2. Login to Firebase
+
+Authenticate with your Google account by running the following command. This will open a browser window for you to log in.
+
+```bash
+firebase login
+```
+
+### 3. Select your Firebase Project
+
+Associate this local project directory with your Firebase project by running:
+
+```bash
+firebase use --add
+```
+
+Select your Firebase project from the list when prompted.
+
+### 4. Deploy the Application
+
+Once you are ready to deploy, run the following command in your project's root directory:
+
+```bash
+firebase deploy --only apphosting
+```
+
+This command builds your Next.js application and deploys it to Firebase App Hosting. When the deployment is complete, the Firebase CLI will output the URL where your live application can be accessed.
