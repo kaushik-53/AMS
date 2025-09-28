@@ -1,6 +1,4 @@
 
-"use server";
-
 import type { User, Class, TimetableEntry } from './types';
 
 export const initialUsers: Omit<User, 'id'>[] = [
