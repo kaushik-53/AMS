@@ -76,7 +76,7 @@ export function AttendanceReport({
         const classMatch =
           filters.classId === "all" || record.classId === filters.classId;
         const dateMatch =
-          filters.date === "" || record.date === filters.date;
+          filters.date === "" || new Date(record.date) <= new Date(filters.date);
         return studentNameMatch && classMatch && dateMatch;
       })
       .sort((a,b) => new Date(b.date).getTime() - new Date(a.date).getTime());

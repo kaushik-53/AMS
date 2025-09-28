@@ -1,7 +1,7 @@
+
 "use client";
 
 import type { User, Class, AttendanceRecord } from "@/lib/types";
-import { useMemo } from "react";
 import {
   Card,
   CardContent,
