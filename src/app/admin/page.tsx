@@ -16,10 +16,20 @@ import {
   getAllAttendance,
   getStudents,
   getTeachers,
+  seedDatabase
 } from "@/lib/actions";
-import { Users, UserCheck, Percent, CheckCircle, XCircle } from "lucide-react";
+import { Users, UserCheck, Percent, XCircle, Database } from "lucide-react";
 import Link from 'next/link';
 import { Button } from "@/components/ui/button";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+
+function SeedButton() {
+    return (
+        <form action={seedDatabase}>
+            <Button variant="destructive" size="sm"><Database className="mr-2 h-4 w-4"/> Seed Database</Button>
+        </form>
+    )
+}
 
 export default async function AdminDashboardPage({
   searchParams,
@@ -28,8 +38,23 @@ export default async function AdminDashboardPage({
 }) {
   const students = await getStudents();
   const teachers = await getTeachers();
-  const attendanceRecords = await getAllAttendance();
+  
+  if (students.length === 0 || teachers.length === 0) {
+    return (
+        <div className="flex flex-col items-center justify-center h-full space-y-4">
+            <Alert className="max-w-md">
+                <Database className="h-4 w-4"/>
+                <AlertTitle>Welcome to EduTrack!</AlertTitle>
+                <AlertDescription>
+                    Your database appears to be empty. To get started, please seed it with the initial sample data. This will create students, teachers, and timetable information.
+                </AlertDescription>
+            </Alert>
+            <SeedButton />
+        </div>
+    )
+  }
 
+  const attendanceRecords = await getAllAttendance();
   const totalStudents = students.length;
   const totalTeachers = teachers.length;
   const overallAttendance =

@@ -74,7 +74,7 @@ const teacherFormSchema = z.object({
   id: z.string().optional(),
   name: z.string().min(1, "Name is required"),
   email: z.string().min(1, "Login ID is required"),
-  classId: z.string().min(1, "Class assignment is required"),
+  classId: z.string().optional(),
   subject: z.string().optional(),
 });
 
@@ -274,6 +274,7 @@ export function TeachersTable({
                     <Select onValueChange={field.onChange} defaultValue={field.value}>
                         <FormControl><SelectTrigger><SelectValue placeholder="Select a class" /></SelectTrigger></FormControl>
                         <SelectContent>
+                            <SelectItem value="">Unassign</SelectItem>
                             {classes.map(c => <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>)}
                         </SelectContent>
                     </Select>

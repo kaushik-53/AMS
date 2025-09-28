@@ -1,5 +1,3 @@
-
-
 import { getClasses, getUserById, getTimetable, getStudents, getAllAttendance } from "@/lib/actions";
 import { TeacherAttendanceReport } from "./_components/teacher-attendance-report";
 
