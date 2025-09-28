@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import type { User, Class, AttendanceRecord } from "@/lib/types";
 import {
   Card,
@@ -40,11 +40,15 @@ export function AttendanceReport({
   students: User[];
   selectedClass?: Class;
 }) {
-  const [records] = useState(initialRecords);
+  const [records, setRecords] = useState(initialRecords);
   const [filters, setFilters] = useState({
     studentName: "",
     date: "",
   });
+
+  useEffect(() => {
+    setRecords(initialRecords);
+  }, [initialRecords]);
 
   const handleFilterChange = (
     key: "studentName" | "date",
