@@ -1,8 +1,14 @@
-
 import type { User, Class, TimetableEntry, AttendanceRecord } from './types';
 
-// Mock Data
-export const users: User[] = [
+// In-memory data stores
+export const users: User[] = [];
+export const classes: Class[] = [];
+export const timetable: TimetableEntry[] = [];
+export const attendanceRecords: AttendanceRecord[] = [];
+
+
+// Initial mock data for seeding
+export const initialUsers: User[] = [
     // Admin
     { id: 'U1', name: 'Rohan Sharma', email: 'admin', role: 'admin', avatarId: '1', password: 'Admin@123' },
     
@@ -37,12 +43,12 @@ export const users: User[] = [
     { id: 'S1210', name: 'Ishita Prasad', email: 'class12_roll10', role: 'student', grade: 12, parentEmail: 'parent1210@example.com', avatarId: '4', password: 'Student@1210', classId: 'C12' },
 ];
   
-export const classes: Class[] = [
+export const initialClasses: Class[] = [
     { id: 'C11', name: 'Class 11', teacherId: 'U2' },
     { id: 'C12', name: 'Class 12', teacherId: 'U4' },
 ];
   
-export const timetable: TimetableEntry[] = [
+export const initialTimetable: TimetableEntry[] = [
       // Class 11
       { id: 'T1', classId: 'C11', day: 'Monday', period: 1, subject: 'English', teacherId: 'U2' },
       { id: 'T2', classId: 'C11', day: 'Monday', period: 2, subject: 'Physics', teacherId: 'U3' },
@@ -68,7 +74,7 @@ export const timetable: TimetableEntry[] = [
       { id: 'T20', classId: 'C12', day: 'Friday', period: 2, subject: 'Chemistry', teacherId: 'U4' },
   ];
   
-  export const attendanceRecords: AttendanceRecord[] = [
+  export const initialAttendance: AttendanceRecord[] = [
     // Past records for demo
     { id: 'A1', studentId: 'S1101', date: '2024-05-01', status: 'present', classId: 'C11' },
     { id: 'A2', studentId: 'S1102', date: '2024-05-01', status: 'absent', classId: 'C11' },
@@ -76,3 +82,10 @@ export const timetable: TimetableEntry[] = [
     { id: 'A4', studentId: 'S1101', date: '2024-05-02', status: 'present', classId: 'C11' },
     { id: 'A5', studentId: 'S1102', date: '2024-05-02', status: 'present', classId: 'C11' },
   ];
+
+// Initially, load the data stores with the initial data.
+// In a real app, you would fetch this from a database.
+users.push(...initialUsers);
+classes.push(...initialClasses);
+timetable.push(...initialTimetable);
+attendanceRecords.push(...initialAttendance);

@@ -4,7 +4,7 @@
 import { redirect } from "next/navigation";
 import { z } from "zod";
 import type { User, Class, AttendanceRecord, AttendanceStatus, TimetableEntry } from "./types";
-import { users, classes, attendanceRecords, timetable } from "./data";
+import { users, classes, attendanceRecords, timetable, initialUsers, initialClasses, initialTimetable, initialAttendance } from "./data";
 import { sendAbsentEmailNotification } from "@/ai/flows/absent-email-notifications";
 import { revalidatePath } from "next/cache";
 
@@ -52,7 +52,7 @@ export async function loginAction(
 }
 
 export async function logoutAction() {
-  redirect("/");
+  redirect("/login");
 }
 
 // --- Data Fetching ---
@@ -199,4 +199,22 @@ export async function deleteUser(userId: string) {
         return { success: true, message: 'User deleted successfully.' };
     }
     return { success: false, message: 'User not found.' };
+}
+
+export async function seedDatabase() {
+    console.log("Seeding database...");
+    // Clear existing data
+    users.length = 0;
+    classes.length = 0;
+    timetable.length = 0;
+    attendanceRecords.length = 0;
+
+    // Add initial data
+    users.push(...initialUsers);
+    classes.push(...initialClasses);
+    timetable.push(...initialTimetable);
+    attendanceRecords.push(...initialAttendance);
+    
+    console.log("Database seeded.");
+    revalidatePath("/admin");
 }
