@@ -8,7 +8,7 @@ import { sendAbsentEmailNotification } from "@/ai/flows/absent-email-notificatio
 import { revalidatePath } from "next/cache";
 import { adminDb } from "./firebase";
 import { FieldValue } from 'firebase-admin/firestore';
-import { seedDatabase } from "./data";
+import { initialUsers, initialClasses, initialTimetable } from './data';
 
 const passwordValidation = new RegExp(
   /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/
@@ -267,4 +267,51 @@ export async function deleteUser(userId: string) {
     }
 }
 
-export { seedDatabase };
+export async function seedDatabase() {
+    const usersRef = adminDb.collection('users');
+    const classesRef = adminDb.collection('classes');
+    const timetableRef = adminDb.collection('timetable');
+    const attendanceRef = adminDb.collection('attendance');
+
+    const collections = [usersRef, classesRef, timetableRef, attendanceRef];
+    for (const ref of collections) {
+        const snapshot = await ref.limit(500).get();
+        if (snapshot.size > 0) {
+            const batch = adminDb.batch();
+            snapshot.docs.forEach(doc => batch.delete(doc.ref));
+            await batch.commit();
+        }
+    }
+
+    const batch = adminDb.batch();
+    const userIdMap: Record<string, string> = {};
+
+    initialUsers.forEach(user => {
+        const docId = user.role === 'student' ? adminDb.collection('users').doc().id : user.email;
+        const docRef = usersRef.doc(docId);
+        batch.set(docRef, user);
+        userIdMap[user.email] = docId;
+    });
+
+    initialClasses.forEach(c => {
+        const docId = c.name === 'Class 11' ? 'C11' : 'C12';
+        const docRef = classesRef.doc(docId);
+        const teacherId = userIdMap[c.teacherId];
+        batch.set(docRef, { ...c, teacherId });
+    });
+
+    initialTimetable.forEach(t => {
+        const docRef = timetableRef.doc();
+        const teacherId = userIdMap[t.teacherId];
+        batch.set(docRef, { ...t, teacherId });
+    });
+    
+    try {
+        await batch.commit();
+        revalidatePath('/admin');
+        return { success: true, message: 'Database seeded successfully!' };
+    } catch (e) {
+        console.error("Error seeding database: ", e);
+        return { success: false, message: `Failed to seed database. ${e}` };
+    }
+}

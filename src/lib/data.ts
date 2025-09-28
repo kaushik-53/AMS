@@ -2,8 +2,6 @@
 "use server";
 
 import type { User, Class, TimetableEntry } from './types';
-import { adminDb } from "./firebase";
-import { revalidatePath } from "next/cache";
 
 export const initialUsers: Omit<User, 'id'>[] = [
     // Admin
@@ -70,54 +68,3 @@ export const initialTimetable: Omit<TimetableEntry, 'id'>[] = [
       { classId: 'C12', day: 'Friday', period: 1, subject: 'Maths', teacherId: 'maths' },
       { classId: 'C12', day: 'Friday', period: 2, subject: 'Chemistry', teacherId: 'chemistry' },
   ];
-
-export async function seedDatabase() {
-    const usersRef = adminDb.collection('users');
-    const classesRef = adminDb.collection('classes');
-    const timetableRef = adminDb.collection('timetable');
-
-    const usersSnapshot = await usersRef.limit(1).get();
-    if (!usersSnapshot.empty) {
-        return { success: false, message: 'Database already appears to be seeded.' };
-    }
-
-    const batch = adminDb.batch();
-
-    // Seed users and map emails to Firestore IDs
-    const userIdMap: Record<string, string> = {};
-    initialUsers.forEach(user => {
-        const docRef = usersRef.doc(user.email); // Use email as document ID for teachers/admins
-        batch.set(docRef, user);
-        userIdMap[user.email] = docRef.id;
-    });
-     initialUsers.filter(u => u.role ==='student').forEach(user => {
-        const docRef = usersRef.doc(); // Auto-generate ID for students
-        batch.set(docRef, user);
-        if (user.classId) {
-             userIdMap[user.email] = docRef.id;
-        }
-    });
-
-    // Seed classes
-    initialClasses.forEach(c => {
-        const docRef = classesRef.doc(c.name === 'Class 11' ? 'C11' : 'C12');
-        const teacherId = userIdMap[c.teacherId];
-        batch.set(docRef, { ...c, teacherId });
-    });
-
-    // Seed timetable
-    initialTimetable.forEach(t => {
-        const docRef = timetableRef.doc();
-        const teacherId = userIdMap[t.teacherId];
-        batch.set(docRef, { ...t, teacherId });
-    });
-    
-    try {
-        await batch.commit();
-        revalidatePath('/');
-        return { success: true, message: 'Database seeded successfully!' };
-    } catch (e) {
-        console.error("Error seeding database: ", e);
-        return { success: false, message: `Failed to seed database. ${e}` };
-    }
-}
