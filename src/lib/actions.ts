@@ -3,12 +3,12 @@
 
 import { redirect } from "next/navigation";
 import { z } from "zod";
-import { initialUsers, initialClasses, initialTimetable } from "./data";
 import type { User, Class, AttendanceRecord, AttendanceStatus, TimetableEntry } from "./types";
 import { sendAbsentEmailNotification } from "@/ai/flows/absent-email-notifications";
 import { revalidatePath } from "next/cache";
 import { adminDb } from "./firebase";
 import { FieldValue } from 'firebase-admin/firestore';
+import { seedDatabase } from "./data";
 
 const passwordValidation = new RegExp(
   /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/
@@ -267,53 +267,4 @@ export async function deleteUser(userId: string) {
     }
 }
 
-export async function seedDatabase() {
-    const usersRef = adminDb.collection('users');
-    const classesRef = adminDb.collection('classes');
-    const timetableRef = adminDb.collection('timetable');
-
-    const usersSnapshot = await usersRef.limit(1).get();
-    if (!usersSnapshot.empty) {
-        return { success: false, message: 'Database already appears to be seeded.' };
-    }
-
-    const batch = adminDb.batch();
-
-    // Seed users and map emails to Firestore IDs
-    const userIdMap: Record<string, string> = {};
-    initialUsers.forEach(user => {
-        const docRef = usersRef.doc(user.email); // Use email as document ID for teachers/admins
-        batch.set(docRef, user);
-        userIdMap[user.email] = docRef.id;
-    });
-     initialUsers.filter(u => u.role ==='student').forEach(user => {
-        const docRef = usersRef.doc(); // Auto-generate ID for students
-        batch.set(docRef, user);
-        if (user.classId) {
-             userIdMap[user.email] = docRef.id;
-        }
-    });
-
-    // Seed classes
-    initialClasses.forEach(c => {
-        const docRef = classesRef.doc(c.name === 'Class 11' ? 'C11' : 'C12');
-        const teacherId = userIdMap[c.teacherId];
-        batch.set(docRef, { ...c, teacherId });
-    });
-
-    // Seed timetable
-    initialTimetable.forEach(t => {
-        const docRef = timetableRef.doc();
-        const teacherId = userIdMap[t.teacherId];
-        batch.set(docRef, { ...t, teacherId });
-    });
-    
-    try {
-        await batch.commit();
-        revalidatePath('/');
-        return { success: true, message: 'Database seeded successfully!' };
-    } catch (e) {
-        console.error("Error seeding database: ", e);
-        return { success: false, message: `Failed to seed database. ${e}` };
-    }
-}
+export { seedDatabase };
