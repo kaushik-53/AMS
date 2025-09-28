@@ -1,3 +1,4 @@
+
 import { getUserById, getClasses, getTimetable } from "@/lib/actions";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { TeacherAttendance } from "./_components/teacher-attendance";
