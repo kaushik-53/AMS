@@ -19,15 +19,16 @@ const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
 // Initialize Firebase Admin for the server, wrapped in a cached function
-const getAdminDb = cache(() => {
+const initAdmin = () => {
     if (!admin.apps.length) {
         admin.initializeApp({
             credential: admin.credential.applicationDefault(),
-            databaseURL: `https://${firebaseConfig.projectId}.firebaseio.com`
         });
     }
     return admin.firestore();
-});
+};
+
+const getAdminDb = cache(initAdmin);
 
 export const adminDb = getAdminDb();
 
