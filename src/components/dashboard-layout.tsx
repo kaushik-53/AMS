@@ -53,7 +53,7 @@ export function DashboardLayout({ children, navItems }: DashboardLayoutProps) {
             <AppLogo />
             <div className="flex flex-col">
               <h2 className="text-lg font-semibold font-headline tracking-tight">
-                EduTrack
+                AMS
               </h2>
             </div>
           </div>

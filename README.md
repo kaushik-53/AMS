@@ -1,6 +1,6 @@
-# EduTrack - Modern Attendance Management
+# AMS - Modern Attendance Management
 
-This is a Next.js starter project for EduTrack, a modern attendance management system built with Firebase Studio.
+This is a Next.js starter project for AMS, a modern attendance management system built with Firebase Studio.
 
 ## Prerequisites
 

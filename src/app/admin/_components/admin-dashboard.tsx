@@ -41,7 +41,7 @@ export function AdminDashboard({
         return (
             <Card>
                 <CardHeader>
-                    <CardTitle>Welcome to EduTrack</CardTitle>
+                    <CardTitle>Welcome to AMS</CardTitle>
                 </CardHeader>
                 <CardContent>
                     <p className="mb-4">Your database is currently empty. Click the button below to seed it with initial sample data.</p>
