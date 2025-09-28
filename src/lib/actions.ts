@@ -1,12 +1,27 @@
 
 "use server";
 
+import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
-import type { User, Class, AttendanceRecord, AttendanceStatus, TimetableEntry } from "./types";
-import { users, classes, attendanceRecords, timetable, initialUsers, initialClasses, initialTimetable, initialAttendance } from "./data";
 import { sendAbsentEmailNotification } from "@/ai/flows/absent-email-notifications";
-import { revalidatePath } from "next/cache";
+import {
+  users,
+  classes,
+  attendanceRecords,
+  timetable,
+  initialUsers,
+  initialClasses,
+  initialTimetable,
+  initialAttendance,
+} from "./data";
+import type {
+  User,
+  Class,
+  AttendanceRecord,
+  AttendanceStatus,
+  TimetableEntry,
+} from "./types";
 
 const passwordValidation = new RegExp(
   /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/
@@ -22,7 +37,6 @@ const loginSchema = z.object({
         "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character.",
     }),
 });
-
 
 // --- Authentication ---
 
@@ -46,12 +60,13 @@ export async function loginAction(
   if (!user) {
     return { message: "Incorrect username or password." };
   }
-  
+
   const url = `/${user.role}?userId=${user.id}`;
   redirect(url);
 }
 
 export async function logoutAction() {
+  revalidatePath("/", "layout");
   redirect("/login");
 }
 
@@ -66,11 +81,23 @@ export async function getUserById(userId: string): Promise<User | undefined> {
 }
 
 export async function getStudents(): Promise<User[]> {
-  return users.filter((u) => u.role === "student");
+  return users
+    .filter((u) => u.role === "student")
+    .map((u) => {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { password, ...userWithoutPassword } = u;
+      return userWithoutPassword;
+    });
 }
 
 export async function getTeachers(): Promise<User[]> {
-  return users.filter((u) => u.role === "teacher");
+  return users
+    .filter((u) => u.role === "teacher")
+    .map((u) => {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { password, ...userWithoutPassword } = u;
+      return userWithoutPassword;
+    });
 }
 
 export async function getClasses(): Promise<Class[]> {
@@ -78,28 +105,42 @@ export async function getClasses(): Promise<Class[]> {
 }
 
 export async function getStudentsByClass(classId: string): Promise<User[]> {
-    return users.filter(u => u.role === 'student' && u.classId === classId);
+  return users
+    .filter((u) => u.role === "student" && u.classId === classId)
+    .map((u) => {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { password, ...userWithoutPassword } = u;
+      return userWithoutPassword;
+    });
 }
 
-
-export async function getAttendanceForStudent(studentId: string): Promise<AttendanceRecord[]> {
-    return attendanceRecords.filter(a => a.studentId === studentId);
+export async function getAttendanceForStudent(
+  studentId: string
+): Promise<AttendanceRecord[]> {
+  return attendanceRecords.filter((a) => a.studentId === studentId);
 }
 
-export async function getAttendanceByDateAndClass(date: string, classId: string): Promise<AttendanceRecord[]> {
-    return attendanceRecords.filter(a => a.date === date && a.classId === classId);
+export async function getAttendanceByDateAndClass(
+  date: string,
+  classId: string
+): Promise<AttendanceRecord[]> {
+  return attendanceRecords.filter(
+    (a) => a.date === date && a.classId === classId
+  );
 }
 
 export async function getAllAttendance(): Promise<AttendanceRecord[]> {
-    return attendanceRecords;
+  return attendanceRecords;
 }
 
-export async function getAttendanceByClass(classId: string): Promise<AttendanceRecord[]> {
-    return attendanceRecords.filter(a => a.classId === classId);
+export async function getAttendanceByClass(
+  classId: string
+): Promise<AttendanceRecord[]> {
+  return attendanceRecords.filter((a) => a.classId === classId);
 }
 
 export async function getTimetable(): Promise<TimetableEntry[]> {
-    return timetable;
+  return timetable;
 }
 
 // --- Data Mutations ---
@@ -132,13 +173,19 @@ export async function saveAttendance(
     }));
     attendanceRecords.push(...newRecords);
 
-    // Trigger AI email notifications for absent students
+    // Trigger AI email notifications and revalidate paths for absent students
     for (const record of newRecords) {
+        
+      // Revalidate student's own dashboard to show updated summary
+      revalidatePath(`/student?userId=${record.studentId}`);
+
       if (record.status === "absent") {
         const student = users.find((u) => u.id === record.studentId);
         const aClass = classes.find((c) => c.id === record.classId);
         if (student && student.parentEmail && aClass) {
-          await sendAbsentEmailNotification({
+          // This is an async call, but we don't need to wait for it.
+          // Let it run in the background.
+          sendAbsentEmailNotification({
             studentName: student.name,
             parentEmail: student.parentEmail,
             absenceDate: date,
@@ -151,7 +198,7 @@ export async function saveAttendance(
     revalidatePath("/teacher/report");
     revalidatePath("/admin/attendance");
     revalidatePath("/admin");
-    revalidatePath("/student");
+
     return { success: true, message: "Attendance saved successfully." };
   } catch (error) {
     console.error("Error saving attendance: ", error);
@@ -159,62 +206,77 @@ export async function saveAttendance(
   }
 }
 
-async function upsertUser(user: Omit<User, 'password'> & { password?: string }) {
+async function upsertUser(user: Omit<User, "password"> & { password?: string }) {
   const { id, ...userData } = user;
-  
+
   if (id) {
-    const index = users.findIndex(u => u.id === id);
+    const index = users.findIndex((u) => u.id === id);
     if (index !== -1) {
       users[index] = { ...users[index], ...userData, id };
     }
   } else {
-    const newUser: User = { 
-        ...userData, 
-        id: `user-${Date.now()}`,
-        avatarId: `${(users.length % 7) + 1}`,
-        password: user.password || 'Password123!'
+    const newUser: User = {
+      ...userData,
+      id: `user-${Date.now()}`,
+      avatarId: `${(users.length % 7) + 1}`,
+      password: user.password || "Password123!",
     };
     users.push(newUser);
   }
   revalidatePath("/admin/students");
   revalidatePath("/admin/teachers");
-  return { success: true, message: `User ${id ? 'updated' : 'created'} successfully.` };
+  revalidatePath("/admin");
+  return {
+    success: true,
+    message: `User ${id ? "updated" : "created"} successfully.`,
+  };
 }
 
-export async function saveStudent(studentData: { id?: string; name: string; email: string; grade: number; parentEmail: string, classId?: string }) {
-    return upsertUser({ ...studentData, role: 'student' });
+export async function saveStudent(studentData: {
+  id?: string;
+  name: string;
+  email: string;
+  grade: number;
+  parentEmail: string;
+  classId?: string;
+}) {
+  return upsertUser({ ...studentData, role: "student" });
 }
 
-export async function saveTeacher(teacherData: { id?: string; name: string; email: string; classId: string; subject?: string; }) {
-    return upsertUser({ ...teacherData, role: 'teacher' });
+export async function saveTeacher(teacherData: {
+  id?: string;
+  name: string;
+  email: string;
+  classId: string;
+  subject?: string;
+}) {
+  return upsertUser({ ...teacherData, role: "teacher" });
 }
-
 
 export async function deleteUser(userId: string) {
-    const index = users.findIndex(u => u.id === userId);
-    if (index !== -1) {
-        users.splice(index, 1);
-        revalidatePath("/admin/students");
-        revalidatePath("/admin/teachers");
-        return { success: true, message: 'User deleted successfully.' };
-    }
-    return { success: false, message: 'User not found.' };
+  const index = users.findIndex((u) => u.id === userId);
+  if (index !== -1) {
+    users.splice(index, 1);
+    revalidatePath("/admin/students");
+    revalidatePath("/admin/teachers");
+    revalidatePath("/admin");
+    return { success: true, message: "User deleted successfully." };
+  }
+  return { success: false, message: "User not found." };
 }
 
 export async function seedDatabase() {
-    console.log("Seeding database...");
-    // Clear existing data
-    users.length = 0;
-    classes.length = 0;
-    timetable.length = 0;
-    attendanceRecords.length = 0;
-
-    // Add initial data
+  console.log("Seeding database...");
+  // Clear existing data
+  if (users.length === 0) {
+    console.log("No data found. Seeding now.");
     users.push(...initialUsers);
     classes.push(...initialClasses);
     timetable.push(...initialTimetable);
     attendanceRecords.push(...initialAttendance);
-    
     console.log("Database seeded.");
     revalidatePath("/admin");
+  } else {
+    console.log("Database already contains data. Seeding skipped.");
+  }
 }
